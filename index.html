@@ -3,26 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Proviemplea - Talento local para empresas de Providencia</title>
-    <!-- Swiper CSS para el carrusel -->
+    <title>Proviemplea - Portal de Empleos | Municipalidad de Providencia</title>
+    <!-- Swiper CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-    <!-- Tu CSS -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- ==================== NAVBAR CON LOGO ==================== -->
+    <!-- ========== NAVBAR ========== -->
     <nav class="navbar">
         <div class="nav-container">
             <div class="logo">
-                <img src="assets/logo.bmp" alt="Logo Proviemplea" class="logo-img">
+                <img src="imagenes/logo.bmp" alt="Logo Proviemplea" class="logo-img" loading="lazy">
                 <span>Proviemplea</span>
             </div>
             <ul class="nav-menu">
                 <li><a href="#inicio">Inicio</a></li>
                 <li><a href="#nosotros">Nosotros</a></li>
                 <li><a href="#servicios">Servicios</a></li>
-                <li><a href="#ofertas">Ofertas</a></li>
+                <li><a href="#ofertas">Empleos</a></li>
                 <li><a href="#testimonios">Testimonios</a></li>
                 <li><a href="#faq">FAQ</a></li>
                 <li><a href="#contacto">Contacto</a></li>
@@ -31,28 +30,27 @@
         </div>
     </nav>
 
-    <!-- ==================== HERO (PORTADA) ==================== -->
-    <section id="inicio" class="hero" style="background-image: url('assets/portada.jpg');">
+    <!-- ========== HERO (PORTADA) ========== -->
+    <section id="inicio" class="hero" style="background-image: url('imagenes/portada.jpg');">
         <div class="hero-overlay"></div>
         <div class="hero-content">
-            <h1>Conectamos el talento de Providencia con las empresas que lo valoran</h1>
-            <p>Búsqueda inversa: las empresas te encuentran a ti. Sin sesgos, con transparencia.</p>
-            <button class="btn-cta" id="scrollToOfertas">Ver ofertas laborales →</button>
+            <h1>Encuentra trabajo en Providencia</h1>
+            <p>Empresas locales te buscan a ti. Postula a empleos con sueldos transparentes y jornadas flexibles.</p>
+            <button class="btn-cta" id="scrollToOfertas">Ver empleos disponibles →</button>
         </div>
     </section>
 
-    <!-- ==================== NOSOTROS (dinámico desde API) ==================== -->
+    <!-- ========== NOSOTROS (dinámico) ========== -->
     <section id="nosotros" class="section">
         <div class="container">
             <h2>Sobre Proviemplea</h2>
             <div id="nosotros-content" class="nosotros-grid">
-                <!-- Cargado dinámicamente desde API -->
                 <div class="loading">Cargando...</div>
             </div>
         </div>
     </section>
 
-    <!-- ==================== SERVICIOS (dinámico desde API) ==================== -->
+    <!-- ========== SERVICIOS (dinámico) ========== -->
     <section id="servicios" class="section bg-light">
         <div class="container">
             <h2>Nuestros Servicios</h2>
@@ -62,17 +60,17 @@
         </div>
     </section>
 
-    <!-- ==================== OFERTAS LABORALES + IMAGEN INTERMEDIA ==================== -->
+    <!-- ========== OFERTAS DE EMPLEO (con sueldos y jornada) ========== -->
     <section id="ofertas" class="section">
         <div class="container">
-            <h2>Oportunidades laborales</h2>
+            <h2>Ofertas Laborales</h2>
             <div id="ofertas-container" class="ofertas-grid">
                 <div class="loading">Cargando ofertas...</div>
             </div>
         </div>
-        <!-- Imagen intermedia DENTRO de la sección de ofertas -->
+        <!-- Imagen intermedia dentro de ofertas -->
         <div class="banner-intermedio">
-            <img src="assets/intermedia.png" alt="Impulsa tu carrera" loading="lazy">
+            <img src="imagenes/intermedia.png" alt="Impulsa tu carrera" loading="lazy">
             <div class="banner-texto">
                 <h3>¿Eres empresa?</h3>
                 <p>Publica tus ofertas gratis y encuentra el mejor talento local.</p>
@@ -81,13 +79,12 @@
         </div>
     </section>
 
-    <!-- ==================== CARRUSEL DE TESTIMONIOS ==================== -->
+    <!-- ========== CARRUSEL DE TESTIMONIOS ========== -->
     <section id="testimonios" class="section bg-light">
         <div class="container">
-            <h2>Lo que dicen nuestros talentos</h2>
+            <h2>Lo que dicen nuestros postulantes</h2>
             <div class="swiper testimonial-swiper">
                 <div class="swiper-wrapper" id="testimonios-wrapper">
-                    <!-- Los testimonios se inyectan dinámicamente desde API -->
                     <div class="swiper-slide">Cargando testimonios...</div>
                 </div>
                 <div class="swiper-pagination"></div>
@@ -97,7 +94,7 @@
         </div>
     </section>
 
-    <!-- ==================== PREGUNTAS FRECUENTES (FAQ) ==================== -->
+    <!-- ========== PREGUNTAS FRECUENTES ========== -->
     <section id="faq" class="section">
         <div class="container">
             <h2>Preguntas Frecuentes</h2>
@@ -107,34 +104,121 @@
         </div>
     </section>
 
-    <!-- ==================== FORMULARIO DE CONTACTO + SEGURIDAD ==================== -->
+    <!-- ========== FORMULARIO DE CONTACTO GENERAL ========== -->
     <section id="contacto" class="section bg-light">
         <div class="container">
-            <h2>Contáctanos</h2>
-            <form id="contactForm" class="contact-form">
-                <input type="text" name="nombre" placeholder="Tu nombre completo" required>
-                <input type="email" name="email" placeholder="tu@email.com" required>
-                <select name="servicio" required>
-                    <option value="">Selecciona un servicio</option>
-                    <option value="Asesoría laboral">Asesoría laboral</option>
-                    <option value="Capacitación">Capacitación</option>
-                    <option value="Publicar oferta">Publicar oferta</option>
-                    <option value="Otro">Otro</option>
-                </select>
-                <textarea name="mensaje" rows="4" placeholder="Cuéntanos tu consulta..." required></textarea>
-                <!-- Simulamos reCAPTCHA con un campo oculto (en producción usarías el real) -->
-                <input type="hidden" id="recaptchaToken" value="simulado">
-                <button type="submit" class="btn-enviar">Enviar mensaje</button>
-                <div id="form-message"></div>
-            </form>
+            <h2>Comunícate con nosotros</h2>
+            <div class="contact-info-grid">
+                <div class="info-card">
+                    <h3>📞 Teléfonos</h3>
+                    <p>226543726 – 226543591 – 226543931 – 226543463</p>
+                    <h3>✉️ Correos</h3>
+                    <p>solange.montaldo@providencia.cl<br>empleo@providencia.cl</p>
+                    <h3>📍 Dirección</h3>
+                    <p>Los Jesuitas #881, Providencia (Castillo Germini)</p>
+                    <h3>🕒 Horario</h3>
+                    <p>Lunes a viernes de 8:30 a 13:00 horas</p>
+                </div>
+                <div class="info-card">
+                    <h3>Jefa de Empleo</h3>
+                    <p>Solange Montaldo Romero</p>
+                    <h3>Redes Sociales</h3>
+                    <div class="social-links">
+                        <a href="#">🔗 LinkedIn</a>
+                        <a href="#">📷 Instagram</a>
+                        <a href="#">📘 Facebook</a>
+                    </div>
+                    <h3>Newsletter</h3>
+                    <form id="newsletterForm">
+                        <input type="email" placeholder="Tu correo electrónico" required>
+                        <button type="submit">Suscribirme</button>
+                    </form>
+                    <p class="newsletter-message"></p>
+                </div>
+            </div>
         </div>
     </section>
 
-    <!-- ==================== FOOTER ==================== -->
+    <!-- ========== MODAL POSTULACIÓN (oculto al inicio) ========== -->
+    <div id="postularModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Postular a oferta: <span id="modalOfertaTitulo"></span></h2>
+            <form id="postulacionForm">
+                <!-- Datos personales -->
+                <h3>1. Datos Personales e Identidad</h3>
+                <input type="text" name="nombre" placeholder="Nombre Completo" required>
+                <select name="nacionalidad" required>
+                    <option value="">Nacionalidad</option>
+                    <option>Chilena</option>
+                    <option>Extranjera</option>
+                </select>
+                <select name="estadoCivil" required>
+                    <option value="">Estado Civil</option>
+                    <option>Soltero/a</option>
+                    <option>Casado/a</option>
+                    <option>Divorciado/a</option>
+                    <option>Viudo/a</option>
+                </select>
+                <select name="genero" required>
+                    <option value="">Género / Identidad</option>
+                    <option>Femenino</option>
+                    <option>Masculino</option>
+                    <option>No binario</option>
+                    <option>Prefiero no decir</option>
+                </select>
+                <input type="text" name="rut" placeholder="RUT (con guión y DV)" pattern="[0-9]{7,8}-[0-9Kk]" required>
+                <select name="discapacidad">
+                    <option value="">¿Posee alguna discapacidad?</option>
+                    <option>No</option>
+                    <option>Sí, física</option>
+                    <option>Sí, sensorial</option>
+                    <option>Sí, intelectual</option>
+                </select>
+
+                <h3>2. Ubicación, Contacto y Licencia</h3>
+                <input type="text" name="direccion" placeholder="Dirección (Calle y Número)" required>
+                <input type="text" name="comuna" placeholder="Comuna de Residencia" required>
+                <select name="licencia">
+                    <option value="">Licencia de Conducir</option>
+                    <option>No</option>
+                    <option>Clase B</option>
+                    <option>Clase C</option>
+                    <option>Profesional A1/A2</option>
+                </select>
+                <input type="email" name="correo" placeholder="Correo Electrónico" required>
+                <input type="tel" name="telefono" placeholder="Teléfono Celular" required>
+                <select name="disponibilidad">
+                    <option value="">Disponibilidad Horaria</option>
+                    <option>Full time (45 hrs)</option>
+                    <option>Part time (20-30 hrs)</option>
+                    <option>Fines de semana</option>
+                    <option>Horario flexible</option>
+                </select>
+
+                <h3>3. Perfil Profesional y Documentación</h3>
+                <input type="text" name="profesion" placeholder="Profesión u Oficio" required>
+                <select name="experiencia">
+                    <option value="">Experiencia Laboral</option>
+                    <option>Sin experiencia</option>
+                    <option>1-2 años</option>
+                    <option>3-5 años</option>
+                    <option>Más de 5 años</option>
+                </select>
+                <input type="number" name="pretension" placeholder="Pretensiones de Renta Líquida ($)" required>
+                <input type="text" name="idiomas" placeholder="Idiomas">
+                <input type="text" name="habilidades" placeholder="Cursos o Habilidades Tecnológicas">
+
+                <button type="submit">Enviar postulación</button>
+                <div id="postulacionMensaje"></div>
+            </form>
+        </div>
+    </div>
+
     <footer>
         <div class="container">
             <p>© 2026 Proviemplea - Departamento de Empleo, Municipalidad de Providencia</p>
-            <p>Manuel Rodríguez Sur 749, Santiago (Metro Toesca) | centro.santiago@centrossercotec.cl</p>
+            <p>Av. Pedro de Valdivia 963, Providencia, Santiago | Tel: +562 2654 3200</p>
         </div>
     </footer>
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Proviemplea - Portal de Empleos | Municipalidad de Providencia</title>
+    <title>Proviemplea - Portal de Empleos con Inscripción</title>
     <!-- Swiper CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <link rel="stylesheet" href="style.css">
@@ -25,6 +25,7 @@
                 <li><a href="#testimonios">Testimonios</a></li>
                 <li><a href="#faq">FAQ</a></li>
                 <li><a href="#contacto">Contacto</a></li>
+                <li><a href="#" id="loginBtn">👤 Ingresar</a></li>
             </ul>
             <div class="hamburger">☰</div>
         </div>
@@ -35,7 +36,7 @@
         <div class="hero-overlay"></div>
         <div class="hero-content">
             <h1>Encuentra trabajo en Providencia</h1>
-            <p>Empresas locales te buscan a ti. Postula a empleos con sueldos transparentes y jornadas flexibles.</p>
+            <p>Empresas locales te buscan a ti. Postula con tu CV y certificados. Registro gratuito.</p>
             <button class="btn-cta" id="scrollToOfertas">Ver empleos disponibles →</button>
         </div>
     </section>
@@ -44,9 +45,7 @@
     <section id="nosotros" class="section">
         <div class="container">
             <h2>Sobre Proviemplea</h2>
-            <div id="nosotros-content" class="nosotros-grid">
-                <div class="loading">Cargando...</div>
-            </div>
+            <div id="nosotros-content" class="nosotros-grid"></div>
         </div>
     </section>
 
@@ -54,21 +53,22 @@
     <section id="servicios" class="section bg-light">
         <div class="container">
             <h2>Nuestros Servicios</h2>
-            <div id="servicios-content" class="servicios-grid">
-                <div class="loading">Cargando servicios...</div>
-            </div>
+            <div id="servicios-content" class="servicios-grid"></div>
         </div>
     </section>
 
-    <!-- ========== OFERTAS DE EMPLEO (con sueldos y jornada) ========== -->
+    <!-- ========== OFERTAS DE EMPLEO + BUSCADOR ========== -->
     <section id="ofertas" class="section">
         <div class="container">
             <h2>Ofertas Laborales</h2>
-            <div id="ofertas-container" class="ofertas-grid">
-                <div class="loading">Cargando ofertas...</div>
+            <!-- Buscador -->
+            <div class="buscador">
+                <input type="text" id="searchInput" placeholder="Buscar por cargo, empresa, jornada...">
+                <button id="searchBtn">🔍 Buscar</button>
             </div>
+            <div id="ofertas-container" class="ofertas-grid"></div>
         </div>
-        <!-- Imagen intermedia dentro de ofertas -->
+        <!-- Imagen intermedia -->
         <div class="banner-intermedio">
             <img src="imagenes/intermedia.png" alt="Impulsa tu carrera" loading="lazy">
             <div class="banner-texto">
@@ -79,14 +79,12 @@
         </div>
     </section>
 
-    <!-- ========== CARRUSEL DE TESTIMONIOS ========== -->
+    <!-- ========== CARRUSEL TESTIMONIOS ========== -->
     <section id="testimonios" class="section bg-light">
         <div class="container">
             <h2>Lo que dicen nuestros postulantes</h2>
             <div class="swiper testimonial-swiper">
-                <div class="swiper-wrapper" id="testimonios-wrapper">
-                    <div class="swiper-slide">Cargando testimonios...</div>
-                </div>
+                <div class="swiper-wrapper" id="testimonios-wrapper"></div>
                 <div class="swiper-pagination"></div>
                 <div class="swiper-button-prev"></div>
                 <div class="swiper-button-next"></div>
@@ -94,17 +92,15 @@
         </div>
     </section>
 
-    <!-- ========== PREGUNTAS FRECUENTES ========== -->
+    <!-- ========== FAQ ========== -->
     <section id="faq" class="section">
         <div class="container">
             <h2>Preguntas Frecuentes</h2>
-            <div id="faq-content" class="faq-grid">
-                <div class="loading">Cargando FAQs...</div>
-            </div>
+            <div id="faq-content" class="faq-grid"></div>
         </div>
     </section>
 
-    <!-- ========== FORMULARIO DE CONTACTO GENERAL ========== -->
+    <!-- ========== CONTACTO Y NEWSLETTER ========== -->
     <section id="contacto" class="section bg-light">
         <div class="container">
             <h2>Comunícate con nosotros</h2>
@@ -139,75 +135,93 @@
         </div>
     </section>
 
-    <!-- ========== MODAL POSTULACIÓN (oculto al inicio) ========== -->
-    <div id="postularModal" class="modal">
-        <div class="modal-content">
+    <!-- ========== MODAL LOGIN ========== -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content small">
             <span class="close-modal">&times;</span>
-            <h2>Postular a oferta: <span id="modalOfertaTitulo"></span></h2>
-            <form id="postulacionForm">
-                <!-- Datos personales -->
-                <h3>1. Datos Personales e Identidad</h3>
-                <input type="text" name="nombre" placeholder="Nombre Completo" required>
-                <select name="nacionalidad" required>
-                    <option value="">Nacionalidad</option>
-                    <option>Chilena</option>
-                    <option>Extranjera</option>
+            <h2>Iniciar sesión / Registrarse</h2>
+            <form id="loginForm">
+                <input type="email" id="loginEmail" placeholder="Correo electrónico" required>
+                <input type="password" id="loginPassword" placeholder="Contraseña" required>
+                <button type="submit">Ingresar</button>
+                <p id="loginMessage"></p>
+                <hr>
+                <p>¿No tienes cuenta? <a href="#" id="showRegisterLink">Regístrate aquí</a></p>
+            </form>
+            <form id="registerForm" style="display:none;">
+                <input type="email" id="regEmail" placeholder="Correo electrónico" required>
+                <input type="password" id="regPassword" placeholder="Contraseña" required>
+                <button type="submit">Crear cuenta</button>
+                <p id="registerMessage"></p>
+                <p><a href="#" id="showLoginLink">← Volver al login</a></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========== MODAL POSTULACIÓN (formulario completo) ========== -->
+    <div id="postularModal" class="modal">
+        <div class="modal-content large">
+            <span class="close-modal">&times;</span>
+            <h2>Postular a: <span id="modalOfertaTitulo"></span></h2>
+            <form id="postulacionForm" enctype="multipart/form-data">
+                <h3>Datos personales</h3>
+                <input type="text" id="post_nombre" placeholder="Nombre completo" required>
+                <input type="date" id="post_fechaNac" required>
+                <input type="text" id="post_residencia" placeholder="Lugar de residencia (comuna)" required>
+                <select id="post_disponibilidad" required>
+                    <option value="">Disponibilidad horaria</option>
+                    <option>Full time (45 hrs)</option>
+                    <option>Part time (20-30 hrs)</option>
+                    <option>Fines de semana</option>
+                    <option>Horario flexible</option>
                 </select>
-                <select name="estadoCivil" required>
-                    <option value="">Estado Civil</option>
-                    <option>Soltero/a</option>
-                    <option>Casado/a</option>
-                    <option>Divorciado/a</option>
-                    <option>Viudo/a</option>
+                <input type="text" id="post_cursos" placeholder="Cursos (ej: Excel avanzado, Python)">
+                <select id="post_estudios" required>
+                    <option value="">Nivel de estudios</option>
+                    <option>Básica</option>
+                    <option>Media completa</option>
+                    <option>Técnico</option>
+                    <option>Universitaria completa</option>
+                    <option>Postgrado</option>
                 </select>
-                <select name="genero" required>
-                    <option value="">Género / Identidad</option>
-                    <option>Femenino</option>
-                    <option>Masculino</option>
-                    <option>No binario</option>
-                    <option>Prefiero no decir</option>
-                </select>
-                <input type="text" name="rut" placeholder="RUT (con guión y DV)" pattern="[0-9]{7,8}-[0-9Kk]" required>
-                <select name="discapacidad">
+                <input type="number" id="post_pretension" placeholder="Pretensión de renta líquida ($)" required>
+                <input type="email" id="post_email" placeholder="Correo electrónico" required>
+                <input type="tel" id="post_telefono" placeholder="Teléfono" required>
+                <input type="text" id="post_rut" placeholder="RUT (12345678-K)" pattern="[0-9]{7,8}-[0-9Kk]" required>
+                <input type="url" id="post_linkedin" placeholder="LinkedIn (URL)">
+
+                <h3>Documentos</h3>
+                <label>Currículum vitae (PDF, DOC):</label>
+                <input type="file" id="post_cv" accept=".pdf,.doc,.docx" required>
+                <label>Certificado de antecedentes (opcional):</label>
+                <input type="file" id="post_antecedentes" accept=".pdf,.jpg,.png">
+
+                <h3>Otros datos</h3>
+                <select id="post_discapacidad">
                     <option value="">¿Posee alguna discapacidad?</option>
                     <option>No</option>
                     <option>Sí, física</option>
                     <option>Sí, sensorial</option>
                     <option>Sí, intelectual</option>
                 </select>
-
-                <h3>2. Ubicación, Contacto y Licencia</h3>
-                <input type="text" name="direccion" placeholder="Dirección (Calle y Número)" required>
-                <input type="text" name="comuna" placeholder="Comuna de Residencia" required>
-                <select name="licencia">
-                    <option value="">Licencia de Conducir</option>
-                    <option>No</option>
-                    <option>Clase B</option>
-                    <option>Clase C</option>
-                    <option>Profesional A1/A2</option>
+                <select id="post_nacionalidad" required>
+                    <option value="">Nacionalidad</option>
+                    <option>Chilena</option>
+                    <option>Extranjera con residencia</option>
+                    <option>Extranjera sin residencia</option>
                 </select>
-                <input type="email" name="correo" placeholder="Correo Electrónico" required>
-                <input type="tel" name="telefono" placeholder="Teléfono Celular" required>
-                <select name="disponibilidad">
-                    <option value="">Disponibilidad Horaria</option>
-                    <option>Full time (45 hrs)</option>
-                    <option>Part time (20-30 hrs)</option>
-                    <option>Fines de semana</option>
-                    <option>Horario flexible</option>
+                <select id="post_genero" required>
+                    <option value="">Género</option>
+                    <option>Femenino</option>
+                    <option>Masculino</option>
+                    <option>No binario</option>
+                    <option>Prefiero no decir</option>
                 </select>
 
-                <h3>3. Perfil Profesional y Documentación</h3>
-                <input type="text" name="profesion" placeholder="Profesión u Oficio" required>
-                <select name="experiencia">
-                    <option value="">Experiencia Laboral</option>
-                    <option>Sin experiencia</option>
-                    <option>1-2 años</option>
-                    <option>3-5 años</option>
-                    <option>Más de 5 años</option>
-                </select>
-                <input type="number" name="pretension" placeholder="Pretensiones de Renta Líquida ($)" required>
-                <input type="text" name="idiomas" placeholder="Idiomas">
-                <input type="text" name="habilidades" placeholder="Cursos o Habilidades Tecnológicas">
+                <div class="politica">
+                    <input type="checkbox" id="politicaCheck" required>
+                    <label for="politicaCheck">Acepto la <strong>política de confidencialidad e integración</strong>: No seré discriminado por lugar de residencia, creencias religiosas, ideología política, orientación sexual, discapacidad ni ningún otro factor. Mis datos serán tratados con estricta confidencialidad.</label>
+                </div>
 
                 <button type="submit">Enviar postulación</button>
                 <div id="postulacionMensaje"></div>
@@ -222,7 +236,6 @@
         </div>
     </footer>
 
-    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="app.js"></script>
 </body>

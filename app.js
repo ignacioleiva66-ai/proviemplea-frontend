@@ -51,17 +51,26 @@ function crearTarjetaEmpleo(oferta) {
 
 // ========== BUSCADOR CON MENSAJE "NO RESULTADOS" ==========
 let todasOfertas = [];
+
 async function cargarOfertas(filtro = "") {
     const container = document.getElementById('ofertas-container');
     const noResultadosDiv = document.getElementById('noResultados');
-    if (!container) return;
-    const ofertas = await fetchData('ofertas');
-    todasOfertas = ofertas;
-    const filtradas = ofertas.filter(o => 
-        o.titulo.toLowerCase().includes(filtro) ||
-        o.empresa.toLowerCase().includes(filtro) ||
-        o.jornada.toLowerCase().includes(filtro)
+    
+    // Validar que los elementos existan
+    if (!container || !noResultadosDiv) return;
+
+    // Solo hacer fetch si el arreglo está vacío (optimiza el buscador)
+    if (todasOfertas.length === 0) {
+        todasOfertas = await fetchData('ofertas');
+    }
+
+    const filtroLower = filtro.toLowerCase().trim();
+    const filtradas = todasOfertas.filter(o => 
+        o.titulo.toLowerCase().includes(filtroLower) ||
+        o.empresa.toLowerCase().includes(filtroLower) ||
+        o.jornada.toLowerCase().includes(filtroLower)
     );
+
     if (filtradas.length === 0) {
         container.innerHTML = '';
         noResultadosDiv.style.display = 'block';
@@ -69,7 +78,8 @@ async function cargarOfertas(filtro = "") {
         noResultadosDiv.style.display = 'none';
         container.innerHTML = filtradas.map(crearTarjetaEmpleo).join('');
     }
-    // Eventos postular (directo, sin login)
+
+    // Delegación o re-asignación de eventos postular
     document.querySelectorAll('.btn-postular').forEach(btn => {
         btn.addEventListener('click', () => {
             const titulo = btn.dataset.titulo;
@@ -79,34 +89,61 @@ async function cargarOfertas(filtro = "") {
 }
 
 function abrirModalPostulacion(tituloOferta) {
-    document.getElementById('modalOfertaTitulo').innerText = tituloOferta;
-    document.getElementById('postularModal').style.display = 'block';
+    const tituloElement = document.getElementById('modalOfertaTitulo');
+    const modalElement = document.getElementById('postularModal');
+    
+    if (tituloElement && modalElement) {
+        tituloElement.innerText = tituloOferta;
+        modalElement.style.display = 'block';
+    }
 }
 
 // ========== CARGAR DATOS ESTÁTICOS ==========
 async function cargarNosotros() {
     const container = document.getElementById('nosotros-content');
+    if (!container) return;
+    
     const data = await fetchData('nosotros');
-    container.innerHTML = `<div class="card"><h3>Misión</h3><p>${data.mision}</p></div>
+    container.innerHTML = `
+        <div class="card"><h3>Misión</h3><p>${data.mision}</p></div>
         <div class="card"><h3>Visión</h3><p>${data.vision}</p></div>
         <div class="card"><h3>Valores</h3><ul>${data.valores.map(v=>`<li>${v}</li>`).join('')}</ul></div>`;
 }
+
 async function cargarServicios() {
     const container = document.getElementById('servicios-content');
+    if (!container) return;
+
     const servicios = await fetchData('servicios');
     container.innerHTML = servicios.map(s=>`<div class="card"><h3>${s.titulo}</h3><p>${s.descripcion}</p></div>`).join('');
 }
+
 async function cargarTestimonios() {
     const wrapper = document.getElementById('testimonios-wrapper');
+    if (!wrapper) return;
+
     const testimonios = await fetchData('testimonios');
     wrapper.innerHTML = testimonios.map(t=>`<div class="swiper-slide"><p>"${t.texto}"</p><p>- ${t.nombre}</p></div>`).join('');
-    new Swiper('.testimonial-swiper', {
-        loop: true, autoplay:{delay:4000}, pagination:{el:'.swiper-pagination'}, navigation:{nextEl:'.swiper-button-next', prevEl:'.swiper-button-prev'}, keyboard:true,
-        breakpoints:{640:{slidesPerView:1},1024:{slidesPerView:2}}
-    });
+    
+    // Evitar que la app crashee si Swiper no se ha cargado en el HTML
+    if (typeof Swiper !== 'undefined') {
+        new Swiper('.testimonial-swiper', {
+            loop: true, 
+            autoplay: { delay: 4000 }, 
+            pagination: { el: '.swiper-pagination' }, 
+            navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' }, 
+            keyboard: true,
+            breakpoints: { 640: { slidesPerView: 1 }, 1024: { slidesPerView: 2 } }
+        });
+    } else {
+        console.warn('Librería Swiper no encontrada. Los testimonios se renderizarán sin el carrusel.');
+    }
 }
+
 async function cargarFaq() {
     const container = document.getElementById('faq-content');
+    if (!container) return;
+
     const faqs = await fetchData('faq');
     container.innerHTML = faqs.map((item,idx)=>`
         <div class="faq-item" data-index="${idx}">
@@ -114,6 +151,7 @@ async function cargarFaq() {
             <div class="faq-answer">${item.respuesta}</div>
         </div>
     `).join('');
+    
     document.querySelectorAll('.faq-item').forEach(el=>el.addEventListener('click',()=>el.classList.toggle('active')));
 }
 
@@ -123,25 +161,36 @@ function initPostulacion() {
     const form = document.getElementById('postulacionForm');
     const msgDiv = document.getElementById('postulacionMensaje');
 
+    if (!form || !modal || !msgDiv) return;
+
     form.addEventListener('submit', (e) => {
         e.preventDefault();
-        // Validación RUT
-        const rut = document.getElementById('post_rut').value;
+        
+        // Validación RUT (agrega soporte para la "k" minúscula al final por si acaso)
+        const rutInput = document.getElementById('post_rut');
+        const rut = rutInput ? rutInput.value : '';
         if (!/^\d{7,8}-[\dkK]$/.test(rut)) {
             msgDiv.innerHTML = '<span style="color:red">RUT inválido (formato 12345678-K)</span>';
             return;
         }
-        const politica = document.getElementById('politicaCheck').checked;
+        
+        const politicaInput = document.getElementById('politicaCheck');
+        const politica = politicaInput ? politicaInput.checked : false;
         if (!politica) {
             msgDiv.innerHTML = '<span style="color:red">Debes aceptar la política de confidencialidad e integración.</span>';
             return;
         }
-        const cvFile = document.getElementById('post_cv').files[0];
+        
+        const cvInput = document.getElementById('post_cv');
+        const cvFile = cvInput ? cvInput.files[0] : null;
         if (!cvFile) {
             msgDiv.innerHTML = '<span style="color:red">Debes subir tu currículum.</span>';
             return;
         }
+
         // Simular envío
+        msgDiv.innerHTML = '<span style="color:blue">Procesando...</span>';
+        
         setTimeout(() => {
             msgDiv.innerHTML = '<span style="color:green">✅ Postulación enviada con éxito. Nos contactaremos pronto.</span>';
             form.reset();
@@ -157,13 +206,20 @@ function initPostulacion() {
 function initNewsletter() {
     const form = document.getElementById('newsletterForm');
     if (!form) return;
+    
     form.addEventListener('submit', (e) => {
         e.preventDefault();
-        const email = form.querySelector('input').value;
+        const input = form.querySelector('input');
+        if(!input) return;
+        
+        const email = input.value;
         const msg = form.nextElementSibling;
-        msg.innerText = `📧 ${email} suscrito al newsletter.`;
+        
+        if (msg) {
+            msg.innerText = `📧 ${email} suscrito al newsletter.`;
+            setTimeout(() => msg.innerText = '', 3000);
+        }
         form.reset();
-        setTimeout(() => msg.innerText = '', 3000);
     });
 }
 
@@ -172,9 +228,11 @@ function initModales() {
     document.querySelectorAll('.close-modal').forEach(btn => {
         btn.addEventListener('click', () => {
             const modalId = btn.getAttribute('data-modal');
-            document.getElementById(modalId).style.display = 'none';
+            const modal = document.getElementById(modalId);
+            if (modal) modal.style.display = 'none';
         });
     });
+    
     window.addEventListener('click', (e) => {
         if (e.target.classList.contains('modal')) {
             e.target.style.display = 'none';
@@ -186,17 +244,25 @@ function initModales() {
 function initUI() {
     const hamburger = document.querySelector('.hamburger');
     const navMenu = document.querySelector('.nav-menu');
-    if (hamburger) {
+    
+    if (hamburger && navMenu) {
         hamburger.addEventListener('click', () => navMenu.classList.toggle('active'));
-        document.querySelectorAll('.nav-menu a').forEach(link => link.addEventListener('click', () => navMenu.classList.remove('active')));
+        document.querySelectorAll('.nav-menu a').forEach(link => 
+            link.addEventListener('click', () => navMenu.classList.remove('active'))
+        );
     }
-    document.getElementById('scrollToOfertas')?.addEventListener('click', () => document.getElementById('ofertas').scrollIntoView({ behavior: 'smooth' }));
-    document.getElementById('btnEmpresas')?.addEventListener('click', () => document.getElementById('contacto').scrollIntoView({ behavior: 'smooth' }));
+    
+    document.getElementById('scrollToOfertas')?.addEventListener('click', () => document.getElementById('ofertas')?.scrollIntoView({ behavior: 'smooth' }));
+    document.getElementById('btnEmpresas')?.addEventListener('click', () => document.getElementById('contacto')?.scrollIntoView({ behavior: 'smooth' }));
+    
     // Buscador
     const searchBtn = document.getElementById('searchBtn');
     const searchInput = document.getElementById('searchInput');
-    searchBtn?.addEventListener('click', () => cargarOfertas(searchInput.value.toLowerCase()));
-    searchInput?.addEventListener('keyup', (e) => { if (e.key === 'Enter') cargarOfertas(searchInput.value.toLowerCase()); });
+    
+    searchBtn?.addEventListener('click', () => cargarOfertas(searchInput.value));
+    searchInput?.addEventListener('keyup', (e) => { 
+        if (e.key === 'Enter') cargarOfertas(searchInput.value); 
+    });
 }
 
 // ========== INICIALIZACIÓN ==========
@@ -205,9 +271,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     initPostulacion();
     initNewsletter();
     initModales();
-    await cargarOfertas();
-    await cargarNosotros();
-    await cargarServicios();
-    await cargarTestimonios();
-    await cargarFaq();
+    
+    // Cargar contenido asíncrono
+    await Promise.all([
+        cargarOfertas(),
+        cargarNosotros(),
+        cargarServicios(),
+        cargarTestimonios(),
+        cargarFaq()
+    ]);
 });

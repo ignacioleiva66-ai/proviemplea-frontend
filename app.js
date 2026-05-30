@@ -54,8 +54,32 @@ function actualizarNav() {
         loginBtn.onclick = (e) => { e.preventDefault(); cerrarSesion(); };
     } else {
         loginBtn.innerHTML = "👤 Ingresar";
-        loginBtn.onclick = (e) => { e.preventDefault(); document.getElementById('loginModal').style.display = 'block'; };
+        loginBtn.onclick = (e) => { e.preventDefault(); abrirModalLogin(); };
     }
+}
+
+// ========== MODALES ==========
+function abrirModalLogin(mostrarRegistro = true) {
+    const modal = document.getElementById('loginModal');
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+    const showRegisterLink = document.getElementById('showRegisterLink');
+    const showLoginLink = document.getElementById('showLoginLink');
+    if (mostrarRegistro) {
+        loginForm.style.display = 'none';
+        registerForm.style.display = 'block';
+        showRegisterLink.style.display = 'none';
+        showLoginLink.style.display = 'inline';
+    } else {
+        loginForm.style.display = 'block';
+        registerForm.style.display = 'none';
+        showRegisterLink.style.display = 'inline';
+        showLoginLink.style.display = 'none';
+    }
+    modal.style.display = 'block';
+}
+function cerrarModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
 }
 
 // ========== COMPONENTE TARJETA ==========
@@ -87,21 +111,28 @@ async function cargarOfertas(filtro = "") {
         o.jornada.toLowerCase().includes(filtro)
     );
     container.innerHTML = filtradas.map(crearTarjetaEmpleo).join('');
+    // Eventos postular (con verificación de sesión)
     document.querySelectorAll('.btn-postular').forEach(btn => {
         btn.addEventListener('click', () => {
-            if (!currentUser) {
-                alert("Debes iniciar sesión para postular.");
-                document.getElementById('loginModal').style.display = 'block';
-                return;
-            }
             const titulo = btn.dataset.titulo;
-            document.getElementById('modalOfertaTitulo').innerText = titulo;
-            document.getElementById('postularModal').style.display = 'block';
+            if (!currentUser) {
+                // Si no hay sesión, abrir modal de REGISTRO (no login)
+                abrirModalLogin(true);
+                // Guardar la oferta pendiente para postular después del registro
+                window.ofertaPendiente = titulo;
+            } else {
+                abrirModalPostulacion(titulo);
+            }
         });
     });
 }
 
-// ========== CARGAR CONTENIDO ESTÁTICO ==========
+function abrirModalPostulacion(tituloOferta) {
+    document.getElementById('modalOfertaTitulo').innerText = tituloOferta;
+    document.getElementById('postularModal').style.display = 'block';
+}
+
+// ========== CARGAR DATOS ESTÁTICOS ==========
 async function cargarNosotros() {
     const container = document.getElementById('nosotros-content');
     const data = await fetchData('nosotros');
@@ -145,10 +176,20 @@ function initAuth() {
     const loginMessage = document.getElementById('loginMessage');
     const registerMessage = document.getElementById('registerMessage');
 
-    window.showLogin = () => { loginForm.style.display = 'block'; registerForm.style.display = 'none'; };
-    window.showRegister = () => { loginForm.style.display = 'none'; registerForm.style.display = 'block'; };
-    if(showRegisterLink) showRegisterLink.addEventListener('click', (e) => { e.preventDefault(); showRegister(); });
-    if(showLoginLink) showLoginLink.addEventListener('click', (e) => { e.preventDefault(); showLogin(); });
+    showRegisterLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        loginForm.style.display = 'none';
+        registerForm.style.display = 'block';
+        showRegisterLink.style.display = 'none';
+        showLoginLink.style.display = 'inline';
+    });
+    showLoginLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        loginForm.style.display = 'block';
+        registerForm.style.display = 'none';
+        showRegisterLink.style.display = 'inline';
+        showLoginLink.style.display = 'none';
+    });
 
     loginForm.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -159,7 +200,7 @@ function initAuth() {
         if (user) {
             guardarSesion({ email: user.email });
             loginModal.style.display = 'none';
-            location.reload();
+            location.reload(); // Recargar para actualizar navbar y ofertas
         } else {
             loginMessage.innerText = "Credenciales incorrectas. Regístrate primero.";
         }
@@ -177,19 +218,12 @@ function initAuth() {
         users.push({ email, password: pwd });
         localStorage.setItem('proviemplea_users', JSON.stringify(users));
         registerMessage.innerText = "Cuenta creada. Ahora inicia sesión.";
-        setTimeout(() => { showLogin(); registerForm.reset(); }, 1500);
-    });
-
-    // Cerrar modales con X
-    document.querySelectorAll('.close-modal').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            btn.closest('.modal').style.display = 'none';
-        });
-    });
-    window.addEventListener('click', (e) => {
-        if (e.target.classList.contains('modal')) {
-            e.target.style.display = 'none';
-        }
+        // Cambiar a login automáticamente después de 1.5 segundos
+        setTimeout(() => {
+            showLoginLink.click();
+            registerForm.reset();
+            registerMessage.innerText = "";
+        }, 1500);
     });
 }
 
@@ -201,20 +235,19 @@ function initPostulacion() {
 
     form.addEventListener('submit', (e) => {
         e.preventDefault();
-        // Validar RUT
         const rut = document.getElementById('post_rut').value;
         if (!/^\d{7,8}-[\dkK]$/.test(rut)) {
-            msgDiv.innerHTML = '<span style="color:red">❌ RUT inválido (formato 12345678-K)</span>';
+            msgDiv.innerHTML = '<span style="color:red">RUT inválido (formato 12345678-K)</span>';
             return;
         }
         const politica = document.getElementById('politicaCheck').checked;
         if (!politica) {
-            msgDiv.innerHTML = '<span style="color:red">❌ Debes aceptar la política de confidencialidad e integración.</span>';
+            msgDiv.innerHTML = '<span style="color:red">Debes aceptar la política de confidencialidad e integración.</span>';
             return;
         }
         const cvFile = document.getElementById('post_cv').files[0];
         if (!cvFile) {
-            msgDiv.innerHTML = '<span style="color:red">❌ Debes subir tu currículum.</span>';
+            msgDiv.innerHTML = '<span style="color:red">Debes subir tu currículum.</span>';
             return;
         }
         // Simular envío
@@ -243,7 +276,24 @@ function initNewsletter() {
     });
 }
 
-// ========== UI ==========
+// ========== CERRAR MODALES (X y fondo) ==========
+function initModales() {
+    // Cerrar con X
+    document.querySelectorAll('.close-modal').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const modalId = btn.getAttribute('data-modal');
+            cerrarModal(modalId);
+        });
+    });
+    // Cerrar haciendo clic fuera del contenido
+    window.addEventListener('click', (e) => {
+        if (e.target.classList.contains('modal')) {
+            e.target.style.display = 'none';
+        }
+    });
+}
+
+// ========== UI ADICIONAL ==========
 function initUI() {
     const hamburger = document.querySelector('.hamburger');
     const navMenu = document.querySelector('.nav-menu');
@@ -253,6 +303,7 @@ function initUI() {
     }
     document.getElementById('scrollToOfertas')?.addEventListener('click', () => document.getElementById('ofertas').scrollIntoView({ behavior: 'smooth' }));
     document.getElementById('btnEmpresas')?.addEventListener('click', () => document.getElementById('contacto').scrollIntoView({ behavior: 'smooth' }));
+    // Buscador
     const searchBtn = document.getElementById('searchBtn');
     const searchInput = document.getElementById('searchInput');
     searchBtn?.addEventListener('click', () => cargarOfertas(searchInput.value.toLowerCase()));
@@ -265,10 +316,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     initAuth();
     initPostulacion();
     initNewsletter();
+    initModales();
     actualizarNav();
     await cargarOfertas();
     await cargarNosotros();
     await cargarServicios();
     await cargarTestimonios();
     await cargarFaq();
+
+    // Si hay una oferta pendiente después de registro (por si se registró y queremos postular)
+    if (window.ofertaPendiente && currentUser) {
+        abrirModalPostulacion(window.ofertaPendiente);
+        window.ofertaPendiente = null;
+    }
 });

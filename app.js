@@ -1,188 +1,235 @@
-/* =====================================================
-   PROVIEMPLEA – app.js
-   ===================================================== */
+// ==================== CONFIGURACIÓN API ====================
+// Si usas json-server local, cambia esta URL a 'http://localhost:3000'
+// Para este ejemplo, usaremos datos mockeados directamente, pero la estructura es idéntica a una API real.
+// Así funciona sin necesidad de instalar nada extra.
 
-/* --- NAVBAR: Scroll effect & hamburger -------------- */
-const navbar    = document.getElementById('navbar');
-const hamburger = document.getElementById('hamburger');
-const navLinks  = document.getElementById('navLinks');
+// Datos mock (simulan respuesta de API)
+const mockAPI = {
+    nosotros: {
+        mision: "Fomentar la empleabilidad inclusiva conectando empresas con talento local de Providencia.",
+        vision: "Ser el puente laboral más eficiente y transparente de Chile.",
+        valores: ["Innovación", "Equidad", "Cercanía"]
+    },
+    servicios: [
+        { titulo: "Búsqueda Inversa", descripcion: "Empresas encuentran perfiles según necesidades, sin currículum ciego." },
+        { titulo: "Capacitación Continua", descripcion: "Cursos gratuitos en habilidades digitales y blandas." },
+        { titulo: "Networking Empresarial", descripcion: "Vinculación con empresas de Providencia." }
+    ],
+    ofertas: [
+        { id: 1, titulo: "Desarrollador Frontend", empresa: "Tecnológica Ltda", ubicacion: "Providencia", tags: ["React", "CSS"] },
+        { id: 2, titulo: "Asesor Comercial", empresa: "Grupo Retail", ubicacion: "Metro Los Leones", tags: ["Ventas", "Atención"] },
+        { id: 3, titulo: "Community Manager", empresa: "Agencia Digital", ubicacion: "Remoto", tags: ["Redes", "Creatividad"] }
+    ],
+    testimonios: [
+        { nombre: "María González", texto: "Encontré trabajo en 2 semanas gracias a Proviemplea. Proceso justo y rápido." },
+        { nombre: "Carlos Méndez", texto: "Las empresas me contactaron a mí. Nunca había vivido una experiencia así." },
+        { nombre: "Javiera Rojas", texto: "Los cursos gratuitos me ayudaron a mejorar mi perfil." }
+    ],
+    faq: [
+        { pregunta: "¿Cómo me registro?", respuesta: "Solo completa el formulario de contacto y te llamaremos." },
+        { pregunta: "¿Es gratuito?", respuesta: "Sí, 100% gratuito para talentos de Providencia." },
+        { pregunta: "¿Empresas pueden publicar?", respuesta: "Sí, escríbenos y te ayudamos." }
+    ]
+};
 
-window.addEventListener('scroll', () => {
-  navbar.classList.toggle('scrolled', window.scrollY > 30);
-});
-
-hamburger.addEventListener('click', () => {
-  const open = hamburger.classList.toggle('open');
-  navLinks.classList.toggle('open', open);
-  document.body.style.overflow = open ? 'hidden' : '';
-});
-
-// Cerrar menú al hacer clic en un enlace
-navLinks.querySelectorAll('a').forEach(link => {
-  link.addEventListener('click', () => {
-    hamburger.classList.remove('open');
-    navLinks.classList.remove('open');
-    document.body.style.overflow = '';
-  });
-});
-
-/* --- TABS del buscador ------------------------------ */
-document.querySelectorAll('.stab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.stab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.search-panel').forEach(p => p.classList.add('hidden'));
-    tab.classList.add('active');
-    document.getElementById('tab-' + tab.dataset.tab).classList.remove('hidden');
-  });
-});
-
-/* --- Búsqueda de empleo ----------------------------- */
-function buscarEmpleo() {
-  const keyword    = document.getElementById('q-keyword').value.trim();
-  const location   = document.getElementById('q-location').value.trim();
-  const area       = document.getElementById('q-area').value;
-  const contract   = document.getElementById('q-contract').value;
-  const experience = document.getElementById('q-experience').value;
-  const salary     = document.getElementById('q-salary').value;
-  const inclusion  = document.getElementById('q-inclusion').checked;
-
-  // Construye resumen de la búsqueda
-  const filters = [];
-  if (keyword)    filters.push(`Cargo: "${keyword}"`);
-  if (location)   filters.push(`Ubicación: ${location}`);
-  if (area)       filters.push(`Área: ${area}`);
-  if (contract)   filters.push(`Contrato: ${contract}`);
-  if (experience) filters.push(`Experiencia: ${experience}`);
-  if (salary)     filters.push(`Renta: ${salary}`);
-  if (inclusion)  filters.push('Solo empleos inclusivos');
-
-  if (filters.length === 0) {
-    mostrarNotificacion('Ingresa al menos un criterio de búsqueda', 'warning');
-    return;
-  }
-
-  mostrarNotificacion(
-    `Buscando: ${filters.join(' · ')}`,
-    'info'
-  );
-
-  // Scroll a ofertas
-  setTimeout(() => {
-    document.getElementById('ofertas').scrollIntoView({ behavior: 'smooth' });
-  }, 600);
-}
-
-/* --- Búsqueda rápida (tags) ------------------------- */
-function quickSearch(term) {
-  document.getElementById('q-keyword').value = term;
-  document.getElementById('tab-buscar').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  document.getElementById('q-keyword').focus();
-}
-
-/* --- Notificaciones --------------------------------- */
-function mostrarNotificacion(mensaje, tipo = 'info') {
-  const existing = document.querySelector('.notif');
-  if (existing) existing.remove();
-
-  const colors = {
-    info:    { bg: '#E6F3FC', border: '#0B7EC4', text: '#0A4E7A' },
-    success: { bg: '#EAF7EE', border: '#1A8C3A', text: '#145B27' },
-    warning: { bg: '#FEF3DC', border: '#F5A623', text: '#7A4E0A' },
-    error:   { bg: '#FDEAEA', border: '#D0342C', text: '#7A1A15' },
-  };
-  const c = colors[tipo] || colors.info;
-
-  const notif = document.createElement('div');
-  notif.className = 'notif';
-  notif.setAttribute('role', 'alert');
-  notif.style.cssText = `
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%) translateY(-80px);
-    background: ${c.bg};
-    border: 1.5px solid ${c.border};
-    color: ${c.text};
-    padding: 14px 24px;
-    border-radius: 50px;
-    font-size: 14px;
-    font-weight: 600;
-    z-index: 9999;
-    max-width: 90vw;
-    text-align: center;
-    box-shadow: 0 8px 24px rgba(0,0,0,.12);
-    transition: transform .35s cubic-bezier(.4,0,.2,1);
-    font-family: 'DM Sans', sans-serif;
-  `;
-  notif.textContent = mensaje;
-  document.body.appendChild(notif);
-
-  // Animar entrada
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      notif.style.transform = 'translateX(-50%) translateY(0)';
+// Función genérica para obtener datos (simula fetch)
+async function fetchData(endpoint) {
+    return new Promise(resolve => {
+        setTimeout(() => {
+            resolve(mockAPI[endpoint]);
+        }, 300);
     });
-  });
-
-  // Auto-ocultar
-  setTimeout(() => {
-    notif.style.transform = 'translateX(-50%) translateY(-80px)';
-    setTimeout(() => notif.remove(), 400);
-  }, 3500);
 }
 
-/* --- Active nav link on scroll ---------------------- */
-const sections = document.querySelectorAll('section[id], div[id]');
-const navAnchors = document.querySelectorAll('.nav-links a[href^="#"]');
+// ==================== COMPONENTE REUTILIZABLE: Tarjeta de Oferta ====================
+function crearTarjetaOferta(oferta) {
+    return `
+        <div class="card oferta-card" data-id="${oferta.id}">
+            <h3>${oferta.titulo}</h3>
+            <p><strong>${oferta.empresa}</strong> - ${oferta.ubicacion}</p>
+            <div class="tags" style="margin: 10px 0">
+                ${oferta.tags.map(tag => `<span style="background:#eef2ff; padding:4px 8px; border-radius:20px; margin-right:5px;">${tag}</span>`).join('')}
+            </div>
+            <button class="btn-contacto" data-servicio="${oferta.titulo}">Contáctanos</button>
+        </div>
+    `;
+}
 
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      navAnchors.forEach(a => {
-        a.style.color = '';
-        a.style.fontWeight = '500';
-        if (a.getAttribute('href') === '#' + entry.target.id) {
-          a.style.color = 'var(--primary)';
-          a.style.fontWeight = '700';
+// ==================== RENDERIZAR OFERTAS ====================
+async function cargarOfertas() {
+    const container = document.getElementById('ofertas-container');
+    if (!container) return;
+    const ofertas = await fetchData('ofertas');
+    container.innerHTML = ofertas.map(crearTarjetaOferta).join('');
+    // Agregar evento a botones "Contáctanos"
+    document.querySelectorAll('.btn-contacto').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const servicio = btn.dataset.servicio;
+            const selectServicio = document.querySelector('select[name="servicio"]');
+            if (selectServicio) {
+                selectServicio.value = servicio;
+                document.getElementById('contacto').scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    });
+}
+
+// ==================== CARGAR NOSOTROS ====================
+async function cargarNosotros() {
+    const container = document.getElementById('nosotros-content');
+    if (!container) return;
+    const data = await fetchData('nosotros');
+    container.innerHTML = `
+        <div class="card">
+            <h3>Misión</h3>
+            <p>${data.mision}</p>
+        </div>
+        <div class="card">
+            <h3>Visión</h3>
+            <p>${data.vision}</p>
+        </div>
+        <div class="card">
+            <h3>Valores</h3>
+            <ul>${data.valores.map(v => `<li>${v}</li>`).join('')}</ul>
+        </div>
+    `;
+}
+
+// ==================== CARGAR SERVICIOS ====================
+async function cargarServicios() {
+    const container = document.getElementById('servicios-content');
+    if (!container) return;
+    const servicios = await fetchData('servicios');
+    container.innerHTML = servicios.map(s => `
+        <div class="card">
+            <h3>${s.titulo}</h3>
+            <p>${s.descripcion}</p>
+        </div>
+    `).join('');
+}
+
+// ==================== CARGAR TESTIMONIOS (CARRUSEL) ====================
+async function cargarTestimonios() {
+    const wrapper = document.getElementById('testimonios-wrapper');
+    if (!wrapper) return;
+    const testimonios = await fetchData('testimonios');
+    wrapper.innerHTML = testimonios.map(t => `
+        <div class="swiper-slide">
+            <p class="testimonial-text">"${t.texto}"</p>
+            <p class="testimonial-author">- ${t.nombre}</p>
+        </div>
+    `).join('');
+    // Inicializar Swiper después de inyectar los testimonios
+    new Swiper('.testimonial-swiper', {
+        loop: true,
+        autoplay: { delay: 4000, disableOnInteraction: false },
+        pagination: { el: '.swiper-pagination', clickable: true },
+        navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
+        keyboard: { enabled: true },
+        breakpoints: { 640: { slidesPerView: 1 }, 1024: { slidesPerView: 2 } }
+    });
+}
+
+// ==================== CARGAR FAQ ====================
+async function cargarFaq() {
+    const container = document.getElementById('faq-content');
+    if (!container) return;
+    const faqs = await fetchData('faq');
+    container.innerHTML = faqs.map((item, index) => `
+        <div class="faq-item" data-index="${index}">
+            <div class="faq-question">
+                <span>${item.pregunta}</span>
+                <span>▼</span>
+            </div>
+            <div class="faq-answer">${item.respuesta}</div>
+        </div>
+    `).join('');
+    // Acordeón FAQ
+    document.querySelectorAll('.faq-item').forEach(item => {
+        item.addEventListener('click', () => {
+            item.classList.toggle('active');
+        });
+    });
+}
+
+// ==================== FORMULARIO CON VALIDACIÓN Y SEGURIDAD ====================
+function initFormulario() {
+    const form = document.getElementById('contactForm');
+    if (!form) return;
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const nombre = form.nombre.value.trim();
+        const email = form.email.value.trim();
+        const servicio = form.servicio.value;
+        const mensaje = form.mensaje.value.trim();
+        const msgDiv = document.getElementById('form-message');
+
+        // Validación cliente
+        if (!nombre || !email || !servicio || !mensaje) {
+            msgDiv.innerHTML = '<span style="color:red;">Todos los campos son obligatorios.</span>';
+            return;
         }
-      });
-    }
-  });
-}, { rootMargin: '-40% 0px -55% 0px' });
+        if (!email.includes('@') || !email.includes('.')) {
+            msgDiv.innerHTML = '<span style="color:red;">Email inválido.</span>';
+            return;
+        }
 
-sections.forEach(s => observer.observe(s));
+        // Simular validación servidor y token CSRF
+        const token = document.getElementById('recaptchaToken').value;
+        if (token !== 'simulado') {
+            msgDiv.innerHTML = '<span style="color:red;">Error de seguridad. Recarga la página.</span>';
+            return;
+        }
 
-/* --- Entrance animations on scroll ----------------- */
-const animObserver = new IntersectionObserver(entries => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add('visible');
-      animObserver.unobserve(entry.target);
-    }
-  });
-}, { threshold: 0.12 });
-
-document.querySelectorAll('.step-card, .offer-card, .contact-item, .about-text').forEach(el => {
-  el.style.opacity = '0';
-  el.style.transform = 'translateY(24px)';
-  el.style.transition = 'opacity .5s ease, transform .5s ease';
-  animObserver.observe(el);
-});
-
-document.addEventListener('animationend', () => {}, { passive: true });
-
-// Clase .visible activa la animación
-document.head.insertAdjacentHTML('beforeend', `
-<style>
-  .visible {
-    opacity: 1 !important;
-    transform: translateY(0) !important;
-  }
-</style>
-`);
-
-/* --- Año dinámico en footer ------------------------- */
-const yearEl = document.querySelector('.footer-bottom p');
-if (yearEl) {
-  yearEl.textContent = yearEl.textContent.replace('2026', new Date().getFullYear());
+        // Simular envío (aquí iría POST a API real)
+        msgDiv.innerHTML = '<span style="color:green;">¡Mensaje enviado! Te contactaremos pronto.</span>';
+        form.reset();
+        setTimeout(() => msgDiv.innerHTML = '', 3000);
+    });
 }
+
+// ==================== NAVEGACIÓN MÓVIL ====================
+function initMobileNav() {
+    const hamburger = document.querySelector('.hamburger');
+    const navMenu = document.querySelector('.nav-menu');
+    if (hamburger && navMenu) {
+        hamburger.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+        });
+    }
+    // Cerrar menú al hacer click en un enlace
+    document.querySelectorAll('.nav-menu a').forEach(link => {
+        link.addEventListener('click', () => {
+            navMenu.classList.remove('active');
+        });
+    });
+}
+
+// ==================== SCROLL SUAVE BOTÓN HERO ====================
+function initScrollButtons() {
+    const btn = document.getElementById('scrollToOfertas');
+    if (btn) {
+        btn.addEventListener('click', () => {
+            document.getElementById('ofertas').scrollIntoView({ behavior: 'smooth' });
+        });
+    }
+    const btnEmpresas = document.getElementById('btnEmpresas');
+    if (btnEmpresas) {
+        btnEmpresas.addEventListener('click', () => {
+            document.getElementById('contacto').scrollIntoView({ behavior: 'smooth' });
+        });
+    }
+}
+
+// ==================== INICIALIZAR TODO ====================
+document.addEventListener('DOMContentLoaded', async () => {
+    initMobileNav();
+    initScrollButtons();
+    initFormulario();
+    // Cargar datos dinámicos
+    await cargarOfertas();
+    await cargarNosotros();
+    await cargarServicios();
+    await cargarTestimonios();
+    await cargarFaq();
+});

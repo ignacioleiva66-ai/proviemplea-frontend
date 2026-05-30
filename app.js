@@ -1,9 +1,4 @@
-// ==================== CONFIGURACIÓN API ====================
-// Si usas json-server local, cambia esta URL a 'http://localhost:3000'
-// Para este ejemplo, usaremos datos mockeados directamente, pero la estructura es idéntica a una API real.
-// Así funciona sin necesidad de instalar nada extra.
-
-// Datos mock (simulan respuesta de API)
+// ==================== DATOS MOCK (simulan API) ====================
 const mockAPI = {
     nosotros: {
         mision: "Fomentar la empleabilidad inclusiva conectando empresas con talento local de Providencia.",
@@ -16,217 +11,160 @@ const mockAPI = {
         { titulo: "Networking Empresarial", descripcion: "Vinculación con empresas de Providencia." }
     ],
     ofertas: [
-        { id: 1, titulo: "Desarrollador Frontend", empresa: "Tecnológica Ltda", ubicacion: "Providencia", tags: ["React", "CSS"] },
-        { id: 2, titulo: "Asesor Comercial", empresa: "Grupo Retail", ubicacion: "Metro Los Leones", tags: ["Ventas", "Atención"] },
-        { id: 3, titulo: "Community Manager", empresa: "Agencia Digital", ubicacion: "Remoto", tags: ["Redes", "Creatividad"] }
+        { id: 1, titulo: "Desarrollador Frontend", empresa: "Tecnológica Ltda", ubicacion: "Providencia", jornada: "Full time", sueldo: "$1.200.000 - $1.500.000", tags: ["React", "CSS"] },
+        { id: 2, titulo: "Asesor Comercial", empresa: "Grupo Retail", ubicacion: "Metro Los Leones", jornada: "Part time (25 hrs)", sueldo: "$550.000", tags: ["Ventas", "Atención"] },
+        { id: 3, titulo: "Community Manager", empresa: "Agencia Digital", ubicacion: "Remoto", jornada: "Full time", sueldo: "$800.000", tags: ["Redes", "Creatividad"] },
+        { id: 4, titulo: "Guardia de Seguridad", empresa: "Seguridad Providencia", ubicacion: "Providencia", jornada: "Turnos rotativos", sueldo: "$650.000", tags: ["Vigilancia", "Escolta"] }
     ],
     testimonios: [
-        { nombre: "María González", texto: "Encontré trabajo en 2 semanas gracias a Proviemplea. Proceso justo y rápido." },
-        { nombre: "Carlos Méndez", texto: "Las empresas me contactaron a mí. Nunca había vivido una experiencia así." },
-        { nombre: "Javiera Rojas", texto: "Los cursos gratuitos me ayudaron a mejorar mi perfil." }
+        { nombre: "María González", texto: "Postulé a un part-time y en una semana ya estaba trabajando. Increíble." },
+        { nombre: "Carlos Méndez", texto: "La transparencia en los sueldos me ayudó a elegir mejor." },
+        { nombre: "Javiera Rojas", texto: "Los cursos gratuitos mejoraron mi CV." }
     ],
     faq: [
-        { pregunta: "¿Cómo me registro?", respuesta: "Solo completa el formulario de contacto y te llamaremos." },
-        { pregunta: "¿Es gratuito?", respuesta: "Sí, 100% gratuito para talentos de Providencia." },
-        { pregunta: "¿Empresas pueden publicar?", respuesta: "Sí, escríbenos y te ayudamos." }
+        { pregunta: "¿Cómo postulo a una oferta?", respuesta: "Haz clic en 'Postular' en la tarjeta del empleo y completa el formulario." },
+        { pregunta: "¿Hay costo para postular?", respuesta: "No, es completamente gratuito." },
+        { pregunta: "¿Puedo postular a más de una oferta?", respuesta: "Sí, sin límite." }
     ]
 };
 
-// Función genérica para obtener datos (simula fetch)
 async function fetchData(endpoint) {
-    return new Promise(resolve => {
-        setTimeout(() => {
-            resolve(mockAPI[endpoint]);
-        }, 300);
-    });
+    return new Promise(resolve => setTimeout(() => resolve(mockAPI[endpoint]), 200));
 }
 
-// ==================== COMPONENTE REUTILIZABLE: Tarjeta de Oferta ====================
-function crearTarjetaOferta(oferta) {
+// ==================== COMPONENTE TARJETA DE EMPLEO ====================
+function crearTarjetaEmpleo(oferta) {
     return `
         <div class="card oferta-card" data-id="${oferta.id}">
             <h3>${oferta.titulo}</h3>
             <p><strong>${oferta.empresa}</strong> - ${oferta.ubicacion}</p>
+            <div class="jornada">${oferta.jornada}</div>
+            <div class="sueldo">💰 ${oferta.sueldo}</div>
             <div class="tags" style="margin: 10px 0">
                 ${oferta.tags.map(tag => `<span style="background:#eef2ff; padding:4px 8px; border-radius:20px; margin-right:5px;">${tag}</span>`).join('')}
             </div>
-            <button class="btn-contacto" data-servicio="${oferta.titulo}">Contáctanos</button>
+            <button class="btn-postular" data-titulo="${oferta.titulo}">📌 Postular ahora</button>
         </div>
     `;
 }
 
-// ==================== RENDERIZAR OFERTAS ====================
+// ==================== RENDER OFERTAS ====================
 async function cargarOfertas() {
     const container = document.getElementById('ofertas-container');
     if (!container) return;
     const ofertas = await fetchData('ofertas');
-    container.innerHTML = ofertas.map(crearTarjetaOferta).join('');
-    // Agregar evento a botones "Contáctanos"
-    document.querySelectorAll('.btn-contacto').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const servicio = btn.dataset.servicio;
-            const selectServicio = document.querySelector('select[name="servicio"]');
-            if (selectServicio) {
-                selectServicio.value = servicio;
-                document.getElementById('contacto').scrollIntoView({ behavior: 'smooth' });
-            }
+    container.innerHTML = ofertas.map(crearTarjetaEmpleo).join('');
+    // Asignar evento a cada botón "Postular"
+    document.querySelectorAll('.btn-postular').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const titulo = btn.dataset.titulo;
+            document.getElementById('modalOfertaTitulo').innerText = titulo;
+            document.getElementById('postularModal').style.display = 'block';
         });
     });
 }
 
-// ==================== CARGAR NOSOTROS ====================
+// ==================== CARGAR NOSOTROS, SERVICIOS, TESTIMONIOS, FAQ ====================
 async function cargarNosotros() {
     const container = document.getElementById('nosotros-content');
     if (!container) return;
     const data = await fetchData('nosotros');
     container.innerHTML = `
-        <div class="card">
-            <h3>Misión</h3>
-            <p>${data.mision}</p>
-        </div>
-        <div class="card">
-            <h3>Visión</h3>
-            <p>${data.vision}</p>
-        </div>
-        <div class="card">
-            <h3>Valores</h3>
-            <ul>${data.valores.map(v => `<li>${v}</li>`).join('')}</ul>
-        </div>
+        <div class="card"><h3>Misión</h3><p>${data.mision}</p></div>
+        <div class="card"><h3>Visión</h3><p>${data.vision}</p></div>
+        <div class="card"><h3>Valores</h3><ul>${data.valores.map(v => `<li>${v}</li>`).join('')}</ul></div>
     `;
 }
-
-// ==================== CARGAR SERVICIOS ====================
 async function cargarServicios() {
     const container = document.getElementById('servicios-content');
     if (!container) return;
     const servicios = await fetchData('servicios');
-    container.innerHTML = servicios.map(s => `
-        <div class="card">
-            <h3>${s.titulo}</h3>
-            <p>${s.descripcion}</p>
-        </div>
-    `).join('');
+    container.innerHTML = servicios.map(s => `<div class="card"><h3>${s.titulo}</h3><p>${s.descripcion}</p></div>`).join('');
 }
-
-// ==================== CARGAR TESTIMONIOS (CARRUSEL) ====================
 async function cargarTestimonios() {
     const wrapper = document.getElementById('testimonios-wrapper');
     if (!wrapper) return;
     const testimonios = await fetchData('testimonios');
-    wrapper.innerHTML = testimonios.map(t => `
-        <div class="swiper-slide">
-            <p class="testimonial-text">"${t.texto}"</p>
-            <p class="testimonial-author">- ${t.nombre}</p>
-        </div>
-    `).join('');
-    // Inicializar Swiper después de inyectar los testimonios
+    wrapper.innerHTML = testimonios.map(t => `<div class="swiper-slide"><p class="testimonial-text">"${t.texto}"</p><p class="testimonial-author">- ${t.nombre}</p></div>`).join('');
     new Swiper('.testimonial-swiper', {
-        loop: true,
-        autoplay: { delay: 4000, disableOnInteraction: false },
-        pagination: { el: '.swiper-pagination', clickable: true },
-        navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
-        keyboard: { enabled: true },
+        loop: true, autoplay: { delay: 4000 }, pagination: { el: '.swiper-pagination', clickable: true },
+        navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' }, keyboard: true,
         breakpoints: { 640: { slidesPerView: 1 }, 1024: { slidesPerView: 2 } }
     });
 }
-
-// ==================== CARGAR FAQ ====================
 async function cargarFaq() {
     const container = document.getElementById('faq-content');
     if (!container) return;
     const faqs = await fetchData('faq');
-    container.innerHTML = faqs.map((item, index) => `
-        <div class="faq-item" data-index="${index}">
-            <div class="faq-question">
-                <span>${item.pregunta}</span>
-                <span>▼</span>
-            </div>
+    container.innerHTML = faqs.map((item, idx) => `
+        <div class="faq-item" data-index="${idx}">
+            <div class="faq-question"><span>${item.pregunta}</span><span>▼</span></div>
             <div class="faq-answer">${item.respuesta}</div>
         </div>
     `).join('');
-    // Acordeón FAQ
     document.querySelectorAll('.faq-item').forEach(item => {
-        item.addEventListener('click', () => {
-            item.classList.toggle('active');
-        });
+        item.addEventListener('click', () => item.classList.toggle('active'));
     });
 }
 
-// ==================== FORMULARIO CON VALIDACIÓN Y SEGURIDAD ====================
-function initFormulario() {
-    const form = document.getElementById('contactForm');
+// ==================== FORMULARIOS: NEWSLETTER Y POSTULACIÓN ====================
+function initNewsletter() {
+    const form = document.getElementById('newsletterForm');
     if (!form) return;
-    form.addEventListener('submit', async (e) => {
+    form.addEventListener('submit', (e) => {
         e.preventDefault();
-        const nombre = form.nombre.value.trim();
-        const email = form.email.value.trim();
-        const servicio = form.servicio.value;
-        const mensaje = form.mensaje.value.trim();
-        const msgDiv = document.getElementById('form-message');
-
-        // Validación cliente
-        if (!nombre || !email || !servicio || !mensaje) {
-            msgDiv.innerHTML = '<span style="color:red;">Todos los campos son obligatorios.</span>';
-            return;
-        }
-        if (!email.includes('@') || !email.includes('.')) {
-            msgDiv.innerHTML = '<span style="color:red;">Email inválido.</span>';
-            return;
-        }
-
-        // Simular validación servidor y token CSRF
-        const token = document.getElementById('recaptchaToken').value;
-        if (token !== 'simulado') {
-            msgDiv.innerHTML = '<span style="color:red;">Error de seguridad. Recarga la página.</span>';
-            return;
-        }
-
-        // Simular envío (aquí iría POST a API real)
-        msgDiv.innerHTML = '<span style="color:green;">¡Mensaje enviado! Te contactaremos pronto.</span>';
+        const email = form.querySelector('input').value;
+        const msg = form.nextElementSibling;
+        msg.innerText = `📧 ${email} suscrito al newsletter.`;
         form.reset();
-        setTimeout(() => msgDiv.innerHTML = '', 3000);
+        setTimeout(() => msg.innerText = '', 3000);
     });
 }
 
-// ==================== NAVEGACIÓN MÓVIL ====================
+function initPostulacion() {
+    const modal = document.getElementById('postularModal');
+    const closeBtn = document.querySelector('.close-modal');
+    const form = document.getElementById('postulacionForm');
+    const msgDiv = document.getElementById('postulacionMensaje');
+
+    window.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
+    if (closeBtn) closeBtn.onclick = () => modal.style.display = 'none';
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        // Validaciones básicas
+        const rut = form.querySelector('[name="rut"]').value;
+        if (!/^\d{7,8}-[\dkK]$/.test(rut)) {
+            msgDiv.innerHTML = '<span style="color:red">RUT inválido (formato 12345678-K)</span>';
+            return;
+        }
+        // Simular envío a API
+        msgDiv.innerHTML = '<span style="color:green">✅ Postulación enviada con éxito. Te contactaremos pronto.</span>';
+        form.reset();
+        setTimeout(() => {
+            msgDiv.innerHTML = '';
+            modal.style.display = 'none';
+        }, 3000);
+    });
+}
+
+// ========== NAVEGACIÓN MÓVIL Y SCROLL ==========
 function initMobileNav() {
     const hamburger = document.querySelector('.hamburger');
     const navMenu = document.querySelector('.nav-menu');
     if (hamburger && navMenu) {
-        hamburger.addEventListener('click', () => {
-            navMenu.classList.toggle('active');
-        });
+        hamburger.addEventListener('click', () => navMenu.classList.toggle('active'));
+        document.querySelectorAll('.nav-menu a').forEach(link => link.addEventListener('click', () => navMenu.classList.remove('active')));
     }
-    // Cerrar menú al hacer click en un enlace
-    document.querySelectorAll('.nav-menu a').forEach(link => {
-        link.addEventListener('click', () => {
-            navMenu.classList.remove('active');
-        });
-    });
+    document.getElementById('scrollToOfertas')?.addEventListener('click', () => document.getElementById('ofertas').scrollIntoView({ behavior: 'smooth' }));
+    document.getElementById('btnEmpresas')?.addEventListener('click', () => document.getElementById('contacto').scrollIntoView({ behavior: 'smooth' }));
 }
 
-// ==================== SCROLL SUAVE BOTÓN HERO ====================
-function initScrollButtons() {
-    const btn = document.getElementById('scrollToOfertas');
-    if (btn) {
-        btn.addEventListener('click', () => {
-            document.getElementById('ofertas').scrollIntoView({ behavior: 'smooth' });
-        });
-    }
-    const btnEmpresas = document.getElementById('btnEmpresas');
-    if (btnEmpresas) {
-        btnEmpresas.addEventListener('click', () => {
-            document.getElementById('contacto').scrollIntoView({ behavior: 'smooth' });
-        });
-    }
-}
-
-// ==================== INICIALIZAR TODO ====================
+// ========== INICIALIZACIÓN ==========
 document.addEventListener('DOMContentLoaded', async () => {
     initMobileNav();
-    initScrollButtons();
-    initFormulario();
-    // Cargar datos dinámicos
+    initNewsletter();
+    initPostulacion();
     await cargarOfertas();
     await cargarNosotros();
     await cargarServicios();

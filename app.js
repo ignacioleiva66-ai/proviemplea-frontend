@@ -33,7 +33,7 @@ function fetchData(endpoint) {
     return new Promise(resolve => setTimeout(() => resolve(mockAPI[endpoint]), 200));
 }
 
-// ========== SESIÓN (localStorage) ==========
+// ========== SESIÓN ==========
 let currentUser = JSON.parse(localStorage.getItem('proviemplea_user')) || null;
 
 function guardarSesion(user) {
@@ -87,7 +87,6 @@ async function cargarOfertas(filtro = "") {
         o.jornada.toLowerCase().includes(filtro)
     );
     container.innerHTML = filtradas.map(crearTarjetaEmpleo).join('');
-    // Eventos postular
     document.querySelectorAll('.btn-postular').forEach(btn => {
         btn.addEventListener('click', () => {
             if (!currentUser) {
@@ -102,8 +101,8 @@ async function cargarOfertas(filtro = "") {
     });
 }
 
-// ========== CARGAR DATOS ESTÁTICOS ==========
-async function cargarNosotros() { /* igual que antes */ 
+// ========== CARGAR CONTENIDO ESTÁTICO ==========
+async function cargarNosotros() {
     const container = document.getElementById('nosotros-content');
     const data = await fetchData('nosotros');
     container.innerHTML = `<div class="card"><h3>Misión</h3><p>${data.mision}</p></div>
@@ -148,8 +147,8 @@ function initAuth() {
 
     window.showLogin = () => { loginForm.style.display = 'block'; registerForm.style.display = 'none'; };
     window.showRegister = () => { loginForm.style.display = 'none'; registerForm.style.display = 'block'; };
-    showRegisterLink?.addEventListener('click', (e) => { e.preventDefault(); showRegister(); });
-    showLoginLink?.addEventListener('click', (e) => { e.preventDefault(); showLogin(); });
+    if(showRegisterLink) showRegisterLink.addEventListener('click', (e) => { e.preventDefault(); showRegister(); });
+    if(showLoginLink) showLoginLink.addEventListener('click', (e) => { e.preventDefault(); showLogin(); });
 
     loginForm.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -180,38 +179,45 @@ function initAuth() {
         registerMessage.innerText = "Cuenta creada. Ahora inicia sesión.";
         setTimeout(() => { showLogin(); registerForm.reset(); }, 1500);
     });
+
+    // Cerrar modales con X
+    document.querySelectorAll('.close-modal').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            btn.closest('.modal').style.display = 'none';
+        });
+    });
+    window.addEventListener('click', (e) => {
+        if (e.target.classList.contains('modal')) {
+            e.target.style.display = 'none';
+        }
+    });
 }
 
-// ========== POSTULACIÓN (simula envío con archivos) ==========
+// ========== POSTULACIÓN ==========
 function initPostulacion() {
     const modal = document.getElementById('postularModal');
-    const closeBtn = modal.querySelector('.close-modal');
     const form = document.getElementById('postulacionForm');
     const msgDiv = document.getElementById('postulacionMensaje');
-
-    window.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
-    closeBtn.onclick = () => modal.style.display = 'none';
 
     form.addEventListener('submit', (e) => {
         e.preventDefault();
         // Validar RUT
         const rut = document.getElementById('post_rut').value;
         if (!/^\d{7,8}-[\dkK]$/.test(rut)) {
-            msgDiv.innerHTML = '<span style="color:red">RUT inválido (formato 12345678-K)</span>';
+            msgDiv.innerHTML = '<span style="color:red">❌ RUT inválido (formato 12345678-K)</span>';
             return;
         }
         const politica = document.getElementById('politicaCheck').checked;
         if (!politica) {
-            msgDiv.innerHTML = '<span style="color:red">Debes aceptar la política de confidencialidad e integración.</span>';
+            msgDiv.innerHTML = '<span style="color:red">❌ Debes aceptar la política de confidencialidad e integración.</span>';
             return;
         }
-        // Simular captura de archivos (en un entorno real se enviarían a un servidor)
         const cvFile = document.getElementById('post_cv').files[0];
         if (!cvFile) {
-            msgDiv.innerHTML = '<span style="color:red">Debes subir tu currículum.</span>';
+            msgDiv.innerHTML = '<span style="color:red">❌ Debes subir tu currículum.</span>';
             return;
         }
-        // Aquí simularíamos envío a API con FormData
+        // Simular envío
         setTimeout(() => {
             msgDiv.innerHTML = '<span style="color:green">✅ Postulación enviada con éxito. Nos contactaremos pronto.</span>';
             form.reset();
@@ -237,7 +243,7 @@ function initNewsletter() {
     });
 }
 
-// ========== MOBILE NAV Y SCROLL ==========
+// ========== UI ==========
 function initUI() {
     const hamburger = document.querySelector('.hamburger');
     const navMenu = document.querySelector('.nav-menu');
@@ -247,7 +253,6 @@ function initUI() {
     }
     document.getElementById('scrollToOfertas')?.addEventListener('click', () => document.getElementById('ofertas').scrollIntoView({ behavior: 'smooth' }));
     document.getElementById('btnEmpresas')?.addEventListener('click', () => document.getElementById('contacto').scrollIntoView({ behavior: 'smooth' }));
-    // Buscador
     const searchBtn = document.getElementById('searchBtn');
     const searchInput = document.getElementById('searchInput');
     searchBtn?.addEventListener('click', () => cargarOfertas(searchInput.value.toLowerCase()));

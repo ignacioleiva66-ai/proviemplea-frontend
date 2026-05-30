@@ -8,15 +8,48 @@
     --border-radius: 12px;
     --shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
     --transition: all 0.3s ease;
+    --focus-ring: 0 0 0 3px rgba(0, 84, 164, 0.3);
 }
-* { margin: 0; padding: 0; box-sizing: border-box; }
+
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+}
+
 body {
-    font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
     color: var(--dark);
-    line-height: 1.5;
+    line-height: 1.6;
     scroll-behavior: smooth;
+    background-color: #ffffff;
 }
-/* Navbar */
+
+/* ========== UTILIDADES ========== */
+/* Clase para ocultar visualmente etiquetas pero mantenerlas para lectores de pantalla */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* Accesibilidad: Indicadores de foco para navegación por teclado */
+a:focus-visible, 
+button:focus-visible, 
+input:focus-visible, 
+select:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+    border-radius: 4px;
+}
+
+/* ========== NAVBAR ========== */
 .navbar {
     background: white;
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
@@ -25,6 +58,7 @@ body {
     z-index: 1000;
     padding: 1rem 2rem;
 }
+
 .nav-container {
     max-width: 1280px;
     margin: 0 auto;
@@ -32,47 +66,62 @@ body {
     justify-content: space-between;
     align-items: center;
 }
+
 .logo {
     display: flex;
     align-items: center;
     gap: 0.75rem;
+    text-decoration: none;
 }
+
 .logo-img {
     height: 48px;
     width: auto;
+    object-fit: contain;
 }
+
 .logo span {
     font-weight: 700;
     font-size: 1.5rem;
     color: var(--primary);
 }
+
 .nav-menu {
     display: flex;
     list-style: none;
     gap: 2rem;
 }
+
 .nav-menu a {
     text-decoration: none;
     color: var(--dark);
     font-weight: 500;
     transition: var(--transition);
 }
-.nav-menu a:hover { color: var(--primary); }
+
+.nav-menu a:hover { 
+    color: var(--primary); 
+}
+
 .hamburger {
     display: none;
     font-size: 2rem;
     cursor: pointer;
+    background: transparent;
+    border: none;
+    color: var(--dark);
 }
+
 @media (max-width: 768px) {
     .nav-menu {
         position: fixed;
         left: -100%;
-        top: 70px;
+        top: 80px; /* Ajustado para no tapar el navbar */
         flex-direction: column;
         background: white;
         width: 100%;
         text-align: center;
-        transition: 0.3s;
+        transition: var(--transition);
         gap: 0;
         padding: 2rem 0;
         box-shadow: 0 10px 20px rgba(0,0,0,0.1);
@@ -81,9 +130,11 @@ body {
     .nav-menu li { margin: 1rem 0; }
     .hamburger { display: block; }
 }
-/* Hero */
+
+/* ========== HERO ========== */
 .hero {
     height: 90vh;
+    min-height: 500px;
     background-size: cover;
     background-position: center;
     position: relative;
@@ -92,14 +143,16 @@ body {
     justify-content: center;
     text-align: center;
 }
+
 .hero-overlay {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0, 0, 0, 0.6); /* Ligeramente más oscuro para mejor contraste de texto */
 }
+
 .hero-content {
     position: relative;
     z-index: 2;
@@ -107,195 +160,340 @@ body {
     padding: 2rem;
     color: white;
 }
-.hero-content h1 { font-size: 3rem; margin-bottom: 1rem; }
-.hero-content p { font-size: 1.25rem; margin-bottom: 2rem; }
+
+.hero-content h1 { 
+    font-size: clamp(2rem, 5vw, 3.5rem); /* Texto responsivo fluido */
+    margin-bottom: 1rem; 
+    line-height: 1.2;
+}
+
+.hero-content p { 
+    font-size: 1.25rem; 
+    margin-bottom: 2.5rem; 
+}
+
 .btn-cta {
     background: var(--secondary);
     color: white;
     border: none;
-    padding: 0.8rem 2rem;
+    padding: 1rem 2.5rem;
     font-size: 1.1rem;
+    font-weight: 600;
     border-radius: 50px;
     cursor: pointer;
     transition: var(--transition);
 }
-.btn-cta:hover { background: #008a9a; transform: scale(1.05); }
-/* Secciones */
+
+.btn-cta:hover { 
+    background: #008a9a; 
+    transform: translateY(-3px); 
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+/* ========== SECCIONES GENERALES ========== */
 .section { padding: 5rem 2rem; }
 .container { max-width: 1280px; margin: 0 auto; }
 .bg-light { background: var(--light); }
-h2 { font-size: 2.5rem; margin-bottom: 2.5rem; text-align: center; color: var(--primary); }
-/* Grids */
+
+h2 { 
+    font-size: 2.5rem; 
+    margin-bottom: 3rem; 
+    text-align: center; 
+    color: var(--primary); 
+}
+
+/* ========== GRIDS Y TARJETAS ========== */
 .nosotros-grid, .servicios-grid, .ofertas-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 2rem;
 }
+
 .card {
     background: white;
     border-radius: var(--border-radius);
-    padding: 1.5rem;
+    padding: 2rem;
     box-shadow: var(--shadow);
     transition: var(--transition);
+    border: 1px solid #f0f0f0;
 }
-.card:hover { transform: translateY(-5px); }
-.card h3 { margin-bottom: 0.75rem; color: var(--primary); }
+
+.card:hover { 
+    transform: translateY(-5px); 
+    box-shadow: 0 15px 30px -5px rgba(0,0,0,0.15);
+}
+
+.card h3 { 
+    margin-bottom: 1rem; 
+    color: var(--primary); 
+    font-size: 1.3rem;
+}
+
+/* Tarjeta Oferta Específica */
+.oferta-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.oferta-card p { margin-bottom: 0.5rem; }
+
 .oferta-card .jornada {
     background: #eef2ff;
+    color: var(--primary-dark);
     display: inline-block;
-    padding: 0.2rem 0.8rem;
+    padding: 0.3rem 0.8rem;
     border-radius: 20px;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    align-self: flex-start;
 }
+
 .oferta-card .sueldo {
-    font-weight: bold;
+    font-weight: 700;
     color: var(--secondary);
-    margin: 0.5rem 0;
+    margin: 1rem 0;
+    font-size: 1.1rem;
 }
+
 .btn-postular {
     background: var(--primary);
     color: white;
     border: none;
-    padding: 0.5rem 1rem;
+    padding: 0.75rem 1rem;
     border-radius: 8px;
-    margin-top: 1rem;
+    margin-top: auto; /* Empuja el botón al fondo de la tarjeta */
     cursor: pointer;
     width: 100%;
+    font-weight: 600;
     transition: var(--transition);
 }
-.btn-postular:hover { background: var(--primary-dark); }
-/* Buscador y mensaje sin resultados */
+
+.btn-postular:hover { 
+    background: var(--primary-dark); 
+}
+
+/* ========== BUSCADOR ========== */
 .buscador {
     display: flex;
     gap: 0.5rem;
-    margin-bottom: 2rem;
+    margin-bottom: 3rem;
     justify-content: center;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
 }
+
 .buscador input {
-    width: 60%;
-    padding: 0.8rem;
-    border: 1px solid #ccc;
+    flex: 1;
+    padding: 1rem 1.5rem;
+    border: 2px solid #e1e5eb;
     border-radius: 40px;
     font-size: 1rem;
+    transition: var(--transition);
 }
+
+.buscador input:focus {
+    border-color: var(--primary);
+    outline: none;
+}
+
 .buscador button {
     background: var(--primary);
     color: white;
     border: none;
-    padding: 0 1.5rem;
+    padding: 0 2rem;
     border-radius: 40px;
+    font-weight: 600;
     cursor: pointer;
+    transition: var(--transition);
 }
+
+.buscador button:hover { background: var(--primary-dark); }
+
 .no-resultados {
     text-align: center;
-    padding: 2rem;
+    padding: 3rem;
     font-size: 1.2rem;
     color: var(--gray);
     background: #f8f9fa;
     border-radius: var(--border-radius);
     margin-top: 1rem;
 }
-/* Banner intermedio */
+
+@media (max-width: 600px) {
+    .buscador { flex-direction: column; }
+    .buscador button { padding: 1rem; }
+}
+
+/* ========== BANNER INTERMEDIO ========== */
 .banner-intermedio {
-    margin-top: 3rem;
+    margin-top: 4rem;
     background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
     border-radius: var(--border-radius);
     display: flex;
     align-items: center;
-    flex-wrap: wrap;
     overflow: hidden;
     color: white;
 }
-.banner-intermedio img { width: 40%; object-fit: cover; }
-.banner-texto { flex: 1; padding: 2rem; }
+
+.banner-intermedio img { 
+    width: 40%; 
+    min-height: 300px;
+    object-fit: cover; 
+}
+
+.banner-texto { 
+    flex: 1; 
+    padding: 3rem; 
+}
+
+.banner-texto h3 { font-size: 2rem; margin-bottom: 1rem; }
+.banner-texto p { font-size: 1.1rem; margin-bottom: 1.5rem; }
+
 .btn-secundario {
     background: white;
     color: var(--primary);
     border: none;
-    padding: 0.6rem 1.2rem;
+    padding: 0.8rem 1.5rem;
     border-radius: 30px;
-    margin-top: 1rem;
     font-weight: bold;
     cursor: pointer;
+    transition: var(--transition);
 }
-@media (max-width: 768px) {
+
+.btn-secundario:hover {
+    background: var(--light);
+    transform: translateY(-2px);
+}
+
+@media (max-width: 900px) {
     .banner-intermedio { flex-direction: column; }
-    .banner-intermedio img { width: 100%; }
+    .banner-intermedio img { width: 100%; height: 250px; }
 }
-/* Carrusel */
-.testimonial-swiper { padding: 2rem 1rem 3rem; }
+
+/* ========== CARRUSEL ========== */
+.testimonial-swiper { padding: 1rem 1rem 3rem; }
+
 .swiper-slide {
     background: white;
-    padding: 2rem;
+    padding: 2.5rem;
     border-radius: var(--border-radius);
     text-align: center;
     box-shadow: var(--shadow);
+    height: auto;
 }
-/* FAQ */
+
+.swiper-slide p:first-child {
+    font-size: 1.1rem;
+    font-style: italic;
+    margin-bottom: 1rem;
+    color: var(--dark);
+}
+
+.swiper-slide p:last-child {
+    font-weight: bold;
+    color: var(--primary);
+}
+
+/* ========== FAQ ========== */
 .faq-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 1.5rem;
+    max-width: 1000px;
+    margin: 0 auto;
 }
+
 .faq-item {
     background: white;
     border-radius: var(--border-radius);
-    padding: 1rem 1.5rem;
+    padding: 1.5rem;
     cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    border: 1px solid #eee;
 }
+
 .faq-question {
-    font-weight: bold;
+    font-weight: 600;
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    color: var(--primary);
 }
+
 .faq-answer {
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.3s ease;
+    transition: max-height 0.3s ease, margin-top 0.3s ease;
     color: var(--gray);
 }
+
 .faq-item.active .faq-answer {
-    max-height: 200px;
-    margin-top: 0.8rem;
+    max-height: 300px;
+    margin-top: 1rem;
 }
-/* Contacto */
+
+/* ========== CONTACTO ========== */
 .contact-info-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 2rem;
 }
+
 .info-card {
     background: white;
     border-radius: var(--border-radius);
-    padding: 1.5rem;
+    padding: 2.5rem;
     box-shadow: var(--shadow);
 }
+
+.info-card h3 {
+    color: var(--primary);
+    margin: 1.5rem 0 0.5rem;
+    font-size: 1.2rem;
+}
+
+.info-card h3:first-child { margin-top: 0; }
+
+.social-links { margin-bottom: 2rem; }
 .social-links a {
     display: inline-block;
     margin-right: 1rem;
-    color: var(--primary);
+    color: var(--secondary);
     text-decoration: none;
+    font-weight: 500;
 }
+.social-links a:hover { text-decoration: underline; }
+
 #newsletterForm {
     display: flex;
     gap: 0.5rem;
-    margin-top: 0.5rem;
+    margin-top: 1rem;
 }
+
 #newsletterForm input {
     flex: 1;
-    padding: 0.5rem;
-    border: 1px solid #ddd;
+    padding: 0.75rem;
+    border: 1px solid #ccc;
     border-radius: 8px;
+    font-family: inherit;
 }
+
 #newsletterForm button {
     background: var(--secondary);
     border: none;
-    padding: 0.5rem 1rem;
+    padding: 0.75rem 1.5rem;
     border-radius: 8px;
     color: white;
+    font-weight: 600;
     cursor: pointer;
+    transition: var(--transition);
 }
-/* Modal */
+
+#newsletterForm button:hover { background: #008a9a; }
+.newsletter-message { margin-top: 0.5rem; color: green; font-weight: 500; }
+
+/* ========== MODAL Y FORMULARIO POSTULACIÓN ========== */
 .modal {
     display: none;
     position: fixed;
@@ -304,67 +502,177 @@ h2 { font-size: 2.5rem; margin-bottom: 2.5rem; text-align: center; color: var(--
     top: 0;
     width: 100%;
     height: 100%;
-    overflow: auto;
+    overflow-y: auto; /* Permitir scroll si el modal es más alto que la pantalla */
     background-color: rgba(0,0,0,0.7);
+    padding: 2rem 1rem; /* Espaciado en móviles */
 }
+
 .modal-content {
     background-color: white;
-    margin: 2% auto;
-    padding: 2rem;
+    margin: 0 auto;
+    padding: 2.5rem;
     border-radius: var(--border-radius);
     position: relative;
     animation: fadeIn 0.3s;
 }
+
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(-20px);}
     to { opacity: 1; transform: translateY(0);}
 }
-.modal-content.small { width: 90%; max-width: 500px; }
-.modal-content.large { width: 95%; max-width: 850px; max-height: 90vh; overflow-y: auto; }
+
+.modal-content.large { 
+    width: 100%; 
+    max-width: 800px; 
+}
+
+.modal-content h2 {
+    text-align: left;
+    font-size: 1.8rem;
+    margin-bottom: 2rem;
+    padding-right: 2rem; /* Espacio para el botón de cerrar */
+}
+
+/* El botón de cerrar (ahora es un <button>) */
 .close-modal {
     position: absolute;
     right: 20px;
-    top: 15px;
+    top: 20px;
+    background: none;
+    border: none;
     color: #aaa;
-    font-size: 28px;
-    font-weight: bold;
+    font-size: 2rem;
     cursor: pointer;
+    line-height: 1;
     transition: 0.2s;
 }
-.close-modal:hover { color: black; }
-/* Formulario postulación */
-#postulacionForm input, #postulacionForm select, #postulacionForm label {
+
+.close-modal:hover { color: var(--dark); }
+
+/* Arreglo Semántico del Formulario */
+#postulacionForm fieldset {
+    border: none;
+    margin-bottom: 2rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Dos columnas en escritorio */
+    gap: 1rem 1.5rem;
+}
+
+#postulacionForm legend {
+    font-size: 1.25rem;
+    color: var(--primary);
+    font-weight: bold;
     width: 100%;
-    padding: 0.6rem;
-    margin: 0.5rem 0;
+    border-bottom: 2px solid var(--light);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+    grid-column: 1 / -1; /* Ocupa todo el ancho */
+}
+
+/* Inputs de texto, select, etc. */
+#postulacionForm input[type="text"],
+#postulacionForm input[type="email"],
+#postulacionForm input[type="number"],
+#postulacionForm input[type="tel"],
+#postulacionForm select {
+    width: 100%;
+    padding: 0.8rem;
     border: 1px solid #ccc;
     border-radius: 6px;
+    font-family: inherit;
+    font-size: 1rem;
+    background-color: #fff;
+    transition: border-color 0.2s;
 }
-#postulacionForm h3 {
-    margin-top: 1rem;
-    color: var(--primary);
+
+#postulacionForm input:focus,
+#postulacionForm select:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 84, 164, 0.1);
 }
+
+/* Manejo de Labels (evitando que se les aplique estilos de input) */
+#postulacionForm label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.3rem;
+    font-size: 0.95rem;
+}
+
+/* Ajustes específicos para los archivos */
+#postulacionForm input[type="file"] {
+    width: 100%;
+    padding: 0.5rem 0;
+}
+
+/* Checkbox y Política */
 .politica {
+    grid-column: 1 / -1; /* Ocupa el ancho completo */
     background: #f0f7ff;
-    padding: 1rem;
+    padding: 1.5rem;
     border-radius: 8px;
-    margin: 1rem 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
 }
-.politica input { width: auto; margin-right: 0.5rem; }
-#postulacionForm button {
+
+.politica input[type="checkbox"] {
+    margin-top: 0.3rem;
+    width: 1.2rem;
+    height: 1.2rem;
+    cursor: pointer;
+}
+
+.politica label {
+    margin: 0;
+    font-weight: normal;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    cursor: pointer;
+}
+
+#postulacionForm button[type="submit"] {
+    grid-column: 1 / -1;
     background: var(--secondary);
     color: white;
     border: none;
-    padding: 0.8rem;
+    padding: 1rem;
     border-radius: 8px;
     cursor: pointer;
-    width: 100%;
-    font-size: 1rem;
+    font-size: 1.1rem;
+    font-weight: bold;
+    transition: var(--transition);
+    margin-top: 1rem;
 }
-/* Footer */
+
+#postulacionForm button[type="submit"]:hover {
+    background: #008a9a;
+}
+
+#postulacionMensaje {
+    grid-column: 1 / -1;
+    text-align: center;
+    font-weight: 500;
+    margin-top: 1rem;
+}
+
+/* Formulario en Móviles */
+@media (max-width: 768px) {
+    #postulacionForm fieldset {
+        grid-template-columns: 1fr; /* Una sola columna en móvil */
+    }
+}
+
+/* ========== FOOTER ========== */
 footer {
     background: var(--dark);
     color: white;
     text-align: center;
-    padding: 2rem;
+    padding: 3rem 2rem;
+}
+
+footer p {
+    margin-bottom: 0.5rem;
+    opacity: 0.9;
 }

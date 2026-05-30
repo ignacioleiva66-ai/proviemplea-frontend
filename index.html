@@ -4,13 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Proviemplea - Portal de Empleos con Inscripción</title>
-    <!-- Swiper CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- ========== NAVBAR ========== -->
     <nav class="navbar">
         <div class="nav-container">
             <div class="logo">
@@ -31,7 +29,6 @@
         </div>
     </nav>
 
-    <!-- ========== HERO (PORTADA) ========== -->
     <section id="inicio" class="hero" style="background-image: url('imagenes/portada.jpg');">
         <div class="hero-overlay"></div>
         <div class="hero-content">
@@ -41,7 +38,6 @@
         </div>
     </section>
 
-    <!-- ========== NOSOTROS (dinámico) ========== -->
     <section id="nosotros" class="section">
         <div class="container">
             <h2>Sobre Proviemplea</h2>
@@ -49,7 +45,6 @@
         </div>
     </section>
 
-    <!-- ========== SERVICIOS (dinámico) ========== -->
     <section id="servicios" class="section bg-light">
         <div class="container">
             <h2>Nuestros Servicios</h2>
@@ -57,18 +52,15 @@
         </div>
     </section>
 
-    <!-- ========== OFERTAS DE EMPLEO + BUSCADOR ========== -->
     <section id="ofertas" class="section">
         <div class="container">
             <h2>Ofertas Laborales</h2>
-            <!-- Buscador -->
             <div class="buscador">
                 <input type="text" id="searchInput" placeholder="Buscar por cargo, empresa, jornada...">
                 <button id="searchBtn">🔍 Buscar</button>
             </div>
             <div id="ofertas-container" class="ofertas-grid"></div>
         </div>
-        <!-- Imagen intermedia -->
         <div class="banner-intermedio">
             <img src="imagenes/intermedia.png" alt="Impulsa tu carrera" loading="lazy">
             <div class="banner-texto">
@@ -79,7 +71,6 @@
         </div>
     </section>
 
-    <!-- ========== CARRUSEL TESTIMONIOS ========== -->
     <section id="testimonios" class="section bg-light">
         <div class="container">
             <h2>Lo que dicen nuestros postulantes</h2>
@@ -92,7 +83,6 @@
         </div>
     </section>
 
-    <!-- ========== FAQ ========== -->
     <section id="faq" class="section">
         <div class="container">
             <h2>Preguntas Frecuentes</h2>
@@ -100,7 +90,6 @@
         </div>
     </section>
 
-    <!-- ========== CONTACTO Y NEWSLETTER ========== -->
     <section id="contacto" class="section bg-light">
         <div class="container">
             <h2>Comunícate con nosotros</h2>
@@ -135,7 +124,7 @@
         </div>
     </section>
 
-    <!-- ========== MODAL LOGIN ========== -->
+    <!-- MODAL LOGIN -->
     <div id="loginModal" class="modal">
         <div class="modal-content small">
             <span class="close-modal">&times;</span>
@@ -158,23 +147,27 @@
         </div>
     </div>
 
-    <!-- ========== MODAL POSTULACIÓN (formulario completo) ========== -->
+    <!-- MODAL POSTULACIÓN COMPLETO -->
     <div id="postularModal" class="modal">
         <div class="modal-content large">
             <span class="close-modal">&times;</span>
             <h2>Postular a: <span id="modalOfertaTitulo"></span></h2>
-            <form id="postulacionForm" enctype="multipart/form-data">
-                <h3>Datos personales</h3>
+            <form id="postulacionForm">
+                <h3>📌 Datos personales</h3>
                 <input type="text" id="post_nombre" placeholder="Nombre completo" required>
                 <input type="date" id="post_fechaNac" required>
                 <input type="text" id="post_residencia" placeholder="Lugar de residencia (comuna)" required>
+                
+                <h3>⏰ Disponibilidad</h3>
                 <select id="post_disponibilidad" required>
-                    <option value="">Disponibilidad horaria</option>
+                    <option value="">Selecciona disponibilidad</option>
                     <option>Full time (45 hrs)</option>
                     <option>Part time (20-30 hrs)</option>
                     <option>Fines de semana</option>
                     <option>Horario flexible</option>
                 </select>
+
+                <h3>📚 Formación y habilidades</h3>
                 <input type="text" id="post_cursos" placeholder="Cursos (ej: Excel avanzado, Python)">
                 <select id="post_estudios" required>
                     <option value="">Nivel de estudios</option>
@@ -185,18 +178,20 @@
                     <option>Postgrado</option>
                 </select>
                 <input type="number" id="post_pretension" placeholder="Pretensión de renta líquida ($)" required>
+
+                <h3>📞 Contacto</h3>
                 <input type="email" id="post_email" placeholder="Correo electrónico" required>
                 <input type="tel" id="post_telefono" placeholder="Teléfono" required>
                 <input type="text" id="post_rut" placeholder="RUT (12345678-K)" pattern="[0-9]{7,8}-[0-9Kk]" required>
                 <input type="url" id="post_linkedin" placeholder="LinkedIn (URL)">
 
-                <h3>Documentos</h3>
+                <h3>📄 Documentos</h3>
                 <label>Currículum vitae (PDF, DOC):</label>
                 <input type="file" id="post_cv" accept=".pdf,.doc,.docx" required>
                 <label>Certificado de antecedentes (opcional):</label>
                 <input type="file" id="post_antecedentes" accept=".pdf,.jpg,.png">
 
-                <h3>Otros datos</h3>
+                <h3>🌎 Información adicional</h3>
                 <select id="post_discapacidad">
                     <option value="">¿Posee alguna discapacidad?</option>
                     <option>No</option>
@@ -223,7 +218,7 @@
                     <label for="politicaCheck">Acepto la <strong>política de confidencialidad e integración</strong>: No seré discriminado por lugar de residencia, creencias religiosas, ideología política, orientación sexual, discapacidad ni ningún otro factor. Mis datos serán tratados con estricta confidencialidad.</label>
                 </div>
 
-                <button type="submit">Enviar postulación</button>
+                <button type="submit">✅ Enviar postulación</button>
                 <div id="postulacionMensaje"></div>
             </form>
         </div>

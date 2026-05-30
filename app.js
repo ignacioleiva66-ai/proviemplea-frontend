@@ -23,7 +23,7 @@ const mockAPI = {
         { nombre: "Javiera Rojas", texto: "Los cursos gratuitos mejoraron mi CV." }
     ],
     faq: [
-        { pregunta: "¿Cómo postulo a una oferta?", respuesta: "Haz clic en 'Postular' en la tarjeta del empleo. Debes estar registrado." },
+        { pregunta: "¿Cómo postulo a una oferta?", respuesta: "Haz clic en 'Postular' en la tarjeta del empleo y completa el formulario." },
         { pregunta: "¿Hay costo para postular?", respuesta: "No, es completamente gratuito." },
         { pregunta: "¿Puedo subir documentos?", respuesta: "Sí, CV y certificados." }
     ]
@@ -31,55 +31,6 @@ const mockAPI = {
 
 function fetchData(endpoint) {
     return new Promise(resolve => setTimeout(() => resolve(mockAPI[endpoint]), 200));
-}
-
-// ========== SESIÓN ==========
-let currentUser = JSON.parse(localStorage.getItem('proviemplea_user')) || null;
-
-function guardarSesion(user) {
-    currentUser = user;
-    localStorage.setItem('proviemplea_user', JSON.stringify(user));
-}
-function cerrarSesion() {
-    currentUser = null;
-    localStorage.removeItem('proviemplea_user');
-    alert("Sesión cerrada");
-    location.reload();
-}
-function actualizarNav() {
-    const loginBtn = document.getElementById('loginBtn');
-    if (currentUser) {
-        loginBtn.innerHTML = `👤 ${currentUser.email.split('@')[0]} (Salir)`;
-        loginBtn.href = "#";
-        loginBtn.onclick = (e) => { e.preventDefault(); cerrarSesion(); };
-    } else {
-        loginBtn.innerHTML = "👤 Ingresar";
-        loginBtn.onclick = (e) => { e.preventDefault(); abrirModalLogin(); };
-    }
-}
-
-// ========== MODALES ==========
-function abrirModalLogin(mostrarRegistro = true) {
-    const modal = document.getElementById('loginModal');
-    const loginForm = document.getElementById('loginForm');
-    const registerForm = document.getElementById('registerForm');
-    const showRegisterLink = document.getElementById('showRegisterLink');
-    const showLoginLink = document.getElementById('showLoginLink');
-    if (mostrarRegistro) {
-        loginForm.style.display = 'none';
-        registerForm.style.display = 'block';
-        showRegisterLink.style.display = 'none';
-        showLoginLink.style.display = 'inline';
-    } else {
-        loginForm.style.display = 'block';
-        registerForm.style.display = 'none';
-        showRegisterLink.style.display = 'inline';
-        showLoginLink.style.display = 'none';
-    }
-    modal.style.display = 'block';
-}
-function cerrarModal(modalId) {
-    document.getElementById(modalId).style.display = 'none';
 }
 
 // ========== COMPONENTE TARJETA ==========
@@ -98,10 +49,11 @@ function crearTarjetaEmpleo(oferta) {
     `;
 }
 
-// ========== BUSCADOR ==========
+// ========== BUSCADOR CON MENSAJE "NO RESULTADOS" ==========
 let todasOfertas = [];
 async function cargarOfertas(filtro = "") {
     const container = document.getElementById('ofertas-container');
+    const noResultadosDiv = document.getElementById('noResultados');
     if (!container) return;
     const ofertas = await fetchData('ofertas');
     todasOfertas = ofertas;
@@ -110,19 +62,18 @@ async function cargarOfertas(filtro = "") {
         o.empresa.toLowerCase().includes(filtro) ||
         o.jornada.toLowerCase().includes(filtro)
     );
-    container.innerHTML = filtradas.map(crearTarjetaEmpleo).join('');
-    // Eventos postular (con verificación de sesión)
+    if (filtradas.length === 0) {
+        container.innerHTML = '';
+        noResultadosDiv.style.display = 'block';
+    } else {
+        noResultadosDiv.style.display = 'none';
+        container.innerHTML = filtradas.map(crearTarjetaEmpleo).join('');
+    }
+    // Eventos postular (directo, sin login)
     document.querySelectorAll('.btn-postular').forEach(btn => {
         btn.addEventListener('click', () => {
             const titulo = btn.dataset.titulo;
-            if (!currentUser) {
-                // Si no hay sesión, abrir modal de REGISTRO (no login)
-                abrirModalLogin(true);
-                // Guardar la oferta pendiente para postular después del registro
-                window.ofertaPendiente = titulo;
-            } else {
-                abrirModalPostulacion(titulo);
-            }
+            abrirModalPostulacion(titulo);
         });
     });
 }
@@ -166,68 +117,7 @@ async function cargarFaq() {
     document.querySelectorAll('.faq-item').forEach(el=>el.addEventListener('click',()=>el.classList.toggle('active')));
 }
 
-// ========== LOGIN Y REGISTRO ==========
-function initAuth() {
-    const loginModal = document.getElementById('loginModal');
-    const loginForm = document.getElementById('loginForm');
-    const registerForm = document.getElementById('registerForm');
-    const showRegisterLink = document.getElementById('showRegisterLink');
-    const showLoginLink = document.getElementById('showLoginLink');
-    const loginMessage = document.getElementById('loginMessage');
-    const registerMessage = document.getElementById('registerMessage');
-
-    showRegisterLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        loginForm.style.display = 'none';
-        registerForm.style.display = 'block';
-        showRegisterLink.style.display = 'none';
-        showLoginLink.style.display = 'inline';
-    });
-    showLoginLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        loginForm.style.display = 'block';
-        registerForm.style.display = 'none';
-        showRegisterLink.style.display = 'inline';
-        showLoginLink.style.display = 'none';
-    });
-
-    loginForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const email = document.getElementById('loginEmail').value;
-        const pwd = document.getElementById('loginPassword').value;
-        const users = JSON.parse(localStorage.getItem('proviemplea_users')) || [];
-        const user = users.find(u => u.email === email && u.password === pwd);
-        if (user) {
-            guardarSesion({ email: user.email });
-            loginModal.style.display = 'none';
-            location.reload(); // Recargar para actualizar navbar y ofertas
-        } else {
-            loginMessage.innerText = "Credenciales incorrectas. Regístrate primero.";
-        }
-    });
-
-    registerForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const email = document.getElementById('regEmail').value;
-        const pwd = document.getElementById('regPassword').value;
-        let users = JSON.parse(localStorage.getItem('proviemplea_users')) || [];
-        if (users.find(u => u.email === email)) {
-            registerMessage.innerText = "El correo ya está registrado.";
-            return;
-        }
-        users.push({ email, password: pwd });
-        localStorage.setItem('proviemplea_users', JSON.stringify(users));
-        registerMessage.innerText = "Cuenta creada. Ahora inicia sesión.";
-        // Cambiar a login automáticamente después de 1.5 segundos
-        setTimeout(() => {
-            showLoginLink.click();
-            registerForm.reset();
-            registerMessage.innerText = "";
-        }, 1500);
-    });
-}
-
-// ========== POSTULACIÓN ==========
+// ========== POSTULACIÓN (envío simulado) ==========
 function initPostulacion() {
     const modal = document.getElementById('postularModal');
     const form = document.getElementById('postulacionForm');
@@ -235,6 +125,7 @@ function initPostulacion() {
 
     form.addEventListener('submit', (e) => {
         e.preventDefault();
+        // Validación RUT
         const rut = document.getElementById('post_rut').value;
         if (!/^\d{7,8}-[\dkK]$/.test(rut)) {
             msgDiv.innerHTML = '<span style="color:red">RUT inválido (formato 12345678-K)</span>';
@@ -276,16 +167,14 @@ function initNewsletter() {
     });
 }
 
-// ========== CERRAR MODALES (X y fondo) ==========
+// ========== CERRAR MODALES ==========
 function initModales() {
-    // Cerrar con X
     document.querySelectorAll('.close-modal').forEach(btn => {
-        btn.addEventListener('click', (e) => {
+        btn.addEventListener('click', () => {
             const modalId = btn.getAttribute('data-modal');
-            cerrarModal(modalId);
+            document.getElementById(modalId).style.display = 'none';
         });
     });
-    // Cerrar haciendo clic fuera del contenido
     window.addEventListener('click', (e) => {
         if (e.target.classList.contains('modal')) {
             e.target.style.display = 'none';
@@ -313,20 +202,12 @@ function initUI() {
 // ========== INICIALIZACIÓN ==========
 document.addEventListener('DOMContentLoaded', async () => {
     initUI();
-    initAuth();
     initPostulacion();
     initNewsletter();
     initModales();
-    actualizarNav();
     await cargarOfertas();
     await cargarNosotros();
     await cargarServicios();
     await cargarTestimonios();
     await cargarFaq();
-
-    // Si hay una oferta pendiente después de registro (por si se registró y queremos postular)
-    if (window.ofertaPendiente && currentUser) {
-        abrirModalPostulacion(window.ofertaPendiente);
-        window.ofertaPendiente = null;
-    }
 });

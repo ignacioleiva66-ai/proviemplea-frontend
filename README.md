@@ -1,3 +1,4 @@
+![portada](https://github.com/ignacioleiva66-ai/proviemplea-frontend/blob/1ab83b86154758f96f69d2ea02d94e170069d49c/imagenes/readme.bmp)
 # Proviemplea - Portal de Empleos de Providencia
 
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live-green)](https://ignacioleiva66-ai.github.io/proviemplea-frontend/)

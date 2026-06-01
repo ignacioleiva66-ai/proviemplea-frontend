@@ -46,8 +46,7 @@ proviemplea-frontend/
 │ ├── logo.bmp
 │ ├── portada.jpg
 │ └── intermedia.png
-├── README.md # Este archivo
-└── (opcional) docs/ # Documentación adicional
+├── README.md 
 
 text
 
